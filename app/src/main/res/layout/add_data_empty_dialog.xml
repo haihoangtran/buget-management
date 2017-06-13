@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/empty_data_alert_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="serif-monospace"
+        android:paddingBottom="20dp"
+        android:paddingLeft="5dp"
+        android:paddingTop="10dp"
+        android:text="@string/error_add_data_alert_title"
+        android:textColor="@color/editUserNameTitle"
+        android:textSize="24sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/empty_data_alert_msg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="20dp"
+        android:paddingLeft="15dp"
+        android:text="@string/empty_value_add_data_alert_msg"
+        android:textSize="20dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/add_data_empty_alert_ok_btn"
+            android:layout_width="129dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:background="@color/transparentColor"
+            android:fontFamily="serif-monospace"
+            android:text="@string/ok"
+            android:textColor="@color/editUserNameTitle"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+</LinearLayout>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_withdraw"
+        android:checkable="false"
+        android:enabled="true"
+        android:icon="@drawable/withdraw_nav_icon"
+        android:title="@string/withdraw"
+        android:visible="true" />
+
+    <item
+        android:id="@+id/navigation_deposit"
+        android:enabled="true"
+        android:icon="@drawable/deposit_nav_icon"
+        android:title="@string/deposit"
+        android:visible="true" />
+
+</menu>

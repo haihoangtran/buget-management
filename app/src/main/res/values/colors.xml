@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#e5e5e5</color>
+    <color name="colorPrimaryDark">#303f9f</color>
+    <color name="colorAccent">#e8e8e8</color>
+    <color name="transparentColor">#00e5e5e5</color>
+    <color name="userNameTxt">#7e7d7d</color>
+    <color name="editUserNameTitle">#5c5c5c</color>
+    <color name="editUserNameErrorMsg">#ff0000</color>
+    <color name="homeBalanceTxt">#00a000</color>
+    <color name="homeExpenseTxt">#ff0000</color>
+    <color name="textButton">#4c4c4c</color>
+    <color name="customBoderLine">#545454</color>
+    <color name="addDataNavigation">#b1939393</color>
+    <color name="addDataMsg">#3f3f3f</color>
+    <color name="addDataTitleText">#4d4d4d</color>
+    <color name="addDataTextFieldBox">#e6e6e6</color>
+    <color name="addButton">#0080ff</color>
+    <color name="viewDataCellBorder">#2a2a2a</color>
+</resources>

@@ -1,0 +1,52 @@
+<resources>
+    <string name="app_name">Budget Managment</string>
+    <string name="app_permission_denied">Permission is dennied to read your External Storage</string>
+    <string name="home_menu_edit_username">Edit Name</string>
+    <string name="home_menu_export">Export</string>
+    <string name="home_menu_import">Import</string>
+    <string name="add_new_user_name">Add New User Name</string>
+    <string name="change_user_name"> Change User Name</string>
+    <string name="enter_new_name">Enter new name</string>
+    <string name="empty_username_txt_msg">Username is not Empty. Please, enter valid username.</string>
+    <string name="ok">Ok</string>
+    <string name="cancel">Cancel</string>
+    <string name="balance">Balance</string>
+    <string name="expense">Expense</string>
+    <string name="deposit">Deposit</string>
+    <string name="withdraw">Withdraw</string>
+    <string name="chart">Chart</string>
+    <string name="view">View</string>
+    <string name="enter_info_to_fields_msg">Please, enter information to all following fields.</string>
+    <string name="datecolon">Date:</string>
+    <string name="from">From:</string>
+    <string name="to">To:</string>
+    <string name="amount">Amount:</string>
+    <string name="add_btn">Add</string>
+    <string name="checking">Checking</string>
+    <string name="saving">Saving</string>
+    <string name="error_add_data_alert_title">Error!</string>
+    <string name="empty_value_add_data_alert_msg">There is/are empty value.\nPlease, enter value to all text fields.</string>
+    <string name="confirmation_alert_title">Confirmation!</string>
+    <string name="confirmation_alert_msg">Are you sure to add the following data?</string>
+    <string name="deposit_type_colon">Deposit Type:</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="add_data_successfully_toast_msg">Sucessful Adding!!!</string>
+    <string name="all_view_tab">All</string>
+    <string-array name="month_dropdown_items">
+        <item>January</item>
+        <item>February</item>
+        <item>March</item>
+        <item>April</item>
+        <item>May</item>
+        <item>June</item>
+        <item>July</item>
+        <item>August</item>
+        <item>September</item>
+        <item>October</item>
+        <item>November</item>
+        <item>December</item>
+    </string-array>
+    <string name="edit_data_msg">To edit a data, click on its cell.</string>
+    <string name="edit_title">Edit</string>
+</resources>
