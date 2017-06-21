@@ -1,4 +1,4 @@
-package com.example.haitran.budgemanagement;
+package com.example.haitran.budgetmanagement;
 
 import android.Manifest;
 import android.content.Intent;
@@ -24,6 +24,7 @@ import com.jjoe64.graphview.series.LineGraphSeries;
 import java.util.ArrayList;
 import java.util.List;
 import controller.UserController;
+import controller.FileController;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -118,16 +119,16 @@ public class HomeActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
 
         super.onOptionsItemSelected(item);
-
+        FileController fileController = new FileController();
         switch(item.getItemId()){
             case R.id.home_menu_edit_name:
                 this.editUserNameAlert(getString(R.string.change_user_name), true, "");
                 break;
             case R.id.home_menu_export:
-                // Do something for exporting
+                fileController.exportDBToLocalStorage();
                 break;
             case R.id.home_menu_import:
-                // Do something for importing
+                fileController.importDBFromLocalStorage();
                 break;
         }
         return true;

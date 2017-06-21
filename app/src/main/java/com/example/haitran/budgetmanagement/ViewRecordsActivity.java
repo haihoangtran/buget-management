@@ -1,4 +1,4 @@
-package com.example.haitran.budgemanagement;
+package com.example.haitran.budgetmanagement;
 
 import android.content.Intent;
 import android.support.design.widget.TabLayout;

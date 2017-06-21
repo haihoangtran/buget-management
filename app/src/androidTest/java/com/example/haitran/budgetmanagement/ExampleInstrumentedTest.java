@@ -1,4 +1,4 @@
-package com.example.haitran.budgemanagement;
+package com.example.haitran.budgetmanagement;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

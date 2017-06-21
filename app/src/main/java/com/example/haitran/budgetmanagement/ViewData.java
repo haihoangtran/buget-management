@@ -1,4 +1,4 @@
-package com.example.haitran.budgemanagement;
+package com.example.haitran.budgetmanagement;
 
 import java.io.Serializable;
 

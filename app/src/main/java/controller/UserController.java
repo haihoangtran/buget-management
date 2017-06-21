@@ -1,8 +1,7 @@
 package controller;
 
 import android.os.Environment;
-import constant.Contant;
-
+import constant.Constant;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -15,8 +14,8 @@ import java.io.IOException;
  */
 
 public class UserController {
-    private Contant constant = new Contant();
-    private String rootFolder = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + constant.APP_NAME;
+    private static Constant constant = new Constant();
+    private static String rootFolder = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + constant.APP_NAME;
     private File folder;
     private File file;
 

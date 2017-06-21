@@ -1,4 +1,4 @@
-package com.example.haitran.budgemanagement;
+package com.example.haitran.budgetmanagement;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
