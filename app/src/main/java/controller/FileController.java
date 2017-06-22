@@ -40,16 +40,16 @@ public class FileController {
         }
     }
 
-    public void importDBFromLocalStorage(){
+    public void importDBFromLocalStorage() throws FileNotFoundException {
         /*
         Import database file from local storage
          */
         File srcFile = new File(rootLocalStorage + "/db", constant.getDatabaseName());
         File destFile = new File(Environment.getDataDirectory() + appDBPath, constant.getDatabaseName());
-        createFolder(Environment.getDataDirectory() + appDBPath);
         try {
             if (srcFile.exists()) {
                 try {
+                    createFolder(Environment.getDataDirectory() + appDBPath);
                     destFile.createNewFile();
                     FileChannel srcChanel = new FileInputStream(srcFile).getChannel();
                     FileChannel destChannel = new FileOutputStream(destFile).getChannel();
@@ -61,10 +61,13 @@ public class FileController {
                 throw new FileNotFoundException("Cannot found file at '" + rootLocalStorage + "/db/" + constant.getDatabaseName() + "'");
             }
         }catch (FileNotFoundException e){
-            e.printStackTrace();
+            throw e;
         }
     }
 
+    /*  *******************************************************
+                        PRIVATE FUNCTIONS
+     ******************************************************* */
     private void createFolder (String folderPath){
         /*
         Create folder if it is not existed

@@ -21,15 +21,20 @@ import android.widget.Toast;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
+
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import controller.UserController;
+import controller.DBController;
 import controller.FileController;
 
 public class HomeActivity extends AppCompatActivity {
 
     private String userName="";
     private UserController userController;
+    private DBController dbController;
+    private FileController fileController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +47,10 @@ public class HomeActivity extends AppCompatActivity {
         //User name handle
         userController = new UserController();
         this.userHandle();
+
+        // Define variables
+        dbController = DBController.getInstance(HomeActivity.this);
+        fileController = new FileController();
 
         //Grapth view handle
         List<Double> dmTotal = new ArrayList<>();
@@ -119,7 +128,6 @@ public class HomeActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
 
         super.onOptionsItemSelected(item);
-        FileController fileController = new FileController();
         switch(item.getItemId()){
             case R.id.home_menu_edit_name:
                 this.editUserNameAlert(getString(R.string.change_user_name), true, "");
@@ -128,7 +136,14 @@ public class HomeActivity extends AppCompatActivity {
                 fileController.exportDBToLocalStorage();
                 break;
             case R.id.home_menu_import:
-                fileController.importDBFromLocalStorage();
+                try {
+                    dbController.importDB("local");
+                    System.out.println("*************************");
+                    dbController.getDataType();
+                    System.out.println("*************************");
+                }catch (FileNotFoundException e){
+                    e.printStackTrace();
+                }
                 break;
         }
         return true;
