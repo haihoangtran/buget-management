@@ -10,6 +10,8 @@
     <string name="empty_username_txt_msg">Username is not Empty. Please, enter valid username.</string>
     <string name="ok">Ok</string>
     <string name="cancel">Cancel</string>
+    <string name="file_not_found_alert_title">File Not Found</string>
+    <string name="file_not_found_alert_msg">File bmdb.db not found at\n /storage/emulated/0/Budget Manaement/db</string>
     <string name="balance">Balance</string>
     <string name="expense">Expense</string>
     <string name="deposit">Deposit</string>

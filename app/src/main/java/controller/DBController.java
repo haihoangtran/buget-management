@@ -60,7 +60,6 @@ public class DBController extends SQLiteOpenHelper {
         Import database file from another source
         @param from: database from
          */
-        this.getReadableDatabase();
         switch (from){
             case "local":
                 try{
@@ -74,7 +73,7 @@ public class DBController extends SQLiteOpenHelper {
             this.openDataBase();
             this.getDatabaseName();
         }catch (SQLException e){
-            e.printStackTrace();
+            throw e;
         }
     }
 

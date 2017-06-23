@@ -1,6 +1,7 @@
 package com.example.haitran.budgetmanagement;
 
 import android.Manifest;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -142,7 +143,7 @@ public class HomeActivity extends AppCompatActivity {
                     dbController.getDataType();
                     System.out.println("*************************");
                 }catch (FileNotFoundException e){
-                    e.printStackTrace();
+                    importFileNotFoundAlert();
                 }
                 break;
         }
@@ -312,5 +313,18 @@ public class HomeActivity extends AppCompatActivity {
         customDialog.setCancelable(false);
         customDialog.setCanceledOnTouchOutside(false);
         customDialog.show();
+    }
+
+    private void importFileNotFoundAlert(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(getString(R.string.file_not_found_alert_title));
+        builder.setMessage(getString(R.string.file_not_found_alert_msg));
+        builder.setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener(){
+            public void onClick(DialogInterface dialog, int which){
+
+            }
+        } );
+        builder.create().show();
+
     }
 }

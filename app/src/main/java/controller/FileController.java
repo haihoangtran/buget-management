@@ -46,22 +46,22 @@ public class FileController {
          */
         File srcFile = new File(rootLocalStorage + "/db", constant.getDatabaseName());
         File destFile = new File(Environment.getDataDirectory() + appDBPath, constant.getDatabaseName());
-        try {
-            if (srcFile.exists()) {
-                try {
-                    createFolder(Environment.getDataDirectory() + appDBPath);
-                    destFile.createNewFile();
-                    FileChannel srcChanel = new FileInputStream(srcFile).getChannel();
-                    FileChannel destChannel = new FileOutputStream(destFile).getChannel();
-                    srcChanel.transferTo(0, srcChanel.size(), destChannel);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            } else {
-                throw new FileNotFoundException("Cannot found file at '" + rootLocalStorage + "/db/" + constant.getDatabaseName() + "'");
+        // Delete old file before import new one.
+        if (destFile.exists()) {
+            destFile.delete();
+        }
+        if (srcFile.exists()) {
+            try {
+                createFolder(Environment.getDataDirectory() + appDBPath);
+                destFile.createNewFile();
+                FileChannel srcChanel = new FileInputStream(srcFile).getChannel();
+                FileChannel destChannel = new FileOutputStream(destFile).getChannel();
+                srcChanel.transferTo(0, srcChanel.size(), destChannel);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        }catch (FileNotFoundException e){
-            throw e;
+        } else {
+                throw new FileNotFoundException("Cannot found file at '" + rootLocalStorage + "/db/" + constant.getDatabaseName() + "'");
         }
     }
 
