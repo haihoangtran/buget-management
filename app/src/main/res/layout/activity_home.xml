@@ -175,7 +175,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
                             android:layout_weight="1"
-                            android:text="$21,001.90"
+                            android:text="hai"
                             android:textAlignment="center"
                             android:textColor="@color/colorPrimary"
                             android:textSize="18sp"

@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -24,6 +25,7 @@ import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
 import java.io.FileNotFoundException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import controller.UserController;
@@ -139,9 +141,7 @@ public class HomeActivity extends AppCompatActivity {
             case R.id.home_menu_import:
                 try {
                     dbController.importDB("local");
-                    System.out.println("*************************");
-                    dbController.getDataType();
-                    System.out.println("*************************");
+                    reloadHomeActivity();
                 }catch (FileNotFoundException e){
                     importFileNotFoundAlert();
                 }
@@ -234,6 +234,8 @@ public class HomeActivity extends AppCompatActivity {
     //Handle Balance button
     private void balanceHandle(){
         LinearLayout balanceLayout = (LinearLayout)findViewById(R.id.balance_layout);
+        TextView balanceValue = (TextView)findViewById(R.id.balance_value);
+        balanceValue.setText("$" + dbController.getCurrentBalance());
         balanceLayout.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
@@ -269,7 +271,7 @@ public class HomeActivity extends AppCompatActivity {
         TextView title = (TextView) custom_view.findViewById(R.id.username_edit_title);
         title.setText(alertTitle);
         TextView error_txt = (TextView) custom_view.findViewById(R.id.empty_txt_error_msg);
-        if (error_msg == ""){
+        if (error_msg.matches("")){
             error_txt.setVisibility(View.INVISIBLE);
         }
         else{
@@ -298,6 +300,11 @@ public class HomeActivity extends AppCompatActivity {
                     editUserNameAlert(alertTitle, visibleCancel, getString(R.string.empty_username_txt_msg));
                 }
                 else {
+                    if (alertTitle.matches(getString(R.string.add_new_user_name))){
+                        dbController.getReadableDatabase();
+                        dbController.addDefaultRecordType();
+                        reloadHomeActivity();
+                    }
                     userController.saveUserName(userName);
                     updateUserNameText(userName);
                 }
@@ -325,6 +332,14 @@ public class HomeActivity extends AppCompatActivity {
             }
         } );
         builder.create().show();
+    }
 
+    private void reloadHomeActivity(){
+        Intent intent = getIntent();
+        overridePendingTransition(0, 0);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        finish();
+        overridePendingTransition(0, 0);
+        startActivity(intent);
     }
 }

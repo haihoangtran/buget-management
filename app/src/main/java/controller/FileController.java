@@ -46,10 +46,6 @@ public class FileController {
          */
         File srcFile = new File(rootLocalStorage + "/db", constant.getDatabaseName());
         File destFile = new File(Environment.getDataDirectory() + appDBPath, constant.getDatabaseName());
-        // Delete old file before import new one.
-        if (destFile.exists()) {
-            destFile.delete();
-        }
         if (srcFile.exists()) {
             try {
                 createFolder(Environment.getDataDirectory() + appDBPath);
