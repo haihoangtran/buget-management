@@ -36,6 +36,11 @@ public class DBController extends SQLiteOpenHelper {
     private String RECORD_TYPE_TYPE_ID = constant.getRecordTypeTypeID();
     private String RECORD_TYPE_TYPE_NAME = constant.getRecordTypeTypeName();
     private String RECORD_TYPE_TYPE_TOTAL = constant.getRecordTypeTypeTotal();
+    private String MONTHLY_TOTAL_TABLE = constant.getMonthlyTotalTable();
+    private String MONTHLY_TOTAL_MONTH = constant.getMonthlyTotalMonth();
+    private String MONTHLY_TOTAL_YEAR = constant.getMonthlyTotalYear();
+    private String MONTHLY_TOTAL_TOTAL = constant.getMonthlyTotalTotal();
+    private String MONTHLY_TOTAL_TYPE_ID = constant.getMonthlyTotalTypeID();
 
     public static synchronized DBController getInstance(Context context){
         if(sInstance == null){
@@ -51,8 +56,11 @@ public class DBController extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db){
-        // Creat Record Type table
+        // Create Record Type table
         this.createRecordTypeTable(db);
+        // Create Monthly Total table
+        this.createMonthlyTotalTable(db);
+
     }
 
     @Override
@@ -151,6 +159,13 @@ public class DBController extends SQLiteOpenHelper {
     private void createRecordTypeTable(SQLiteDatabase db){
         String sql = "Create table if not exists " + RECORD_TYPE_TABLE +" (" + RECORD_TYPE_TYPE_ID + " integer, " + RECORD_TYPE_TYPE_NAME + " text, " + RECORD_TYPE_TYPE_TOTAL
                      + " real, primary key(" + RECORD_TYPE_TYPE_ID + "))";
+        db.execSQL(sql);
+    }
+
+    private void createMonthlyTotalTable(SQLiteDatabase db){
+        String sql = "Create table if not exists " + MONTHLY_TOTAL_TABLE + " (" + MONTHLY_TOTAL_MONTH + " integer, " + MONTHLY_TOTAL_YEAR + " integer, " + MONTHLY_TOTAL_TOTAL
+                     + " real, " + MONTHLY_TOTAL_TYPE_ID + " integer, primary key(" + MONTHLY_TOTAL_MONTH + ", " + MONTHLY_TOTAL_YEAR + "), foreign key(" + MONTHLY_TOTAL_TYPE_ID
+                + ") references " + RECORD_TYPE_TABLE + "(" + RECORD_TYPE_TYPE_ID + "))";
         db.execSQL(sql);
     }
 
