@@ -127,7 +127,7 @@ public class DBController extends SQLiteOpenHelper {
 
     }
 
-    public String getCurrentBalance(){
+    public Double getCurrentBalance(){
         /*
         Get current balance from Record Type table by sum of checking and saving
          */
@@ -149,8 +149,42 @@ public class DBController extends SQLiteOpenHelper {
                 cursor.close();
             }
         }
-        return String.format("%.2f", currentBalance);
+        return currentBalance;
     }
+
+    public Double getMonthlyTotal(int month, int year, boolean is_expense){
+        /*
+        Get monthly total of record type by month and year
+        @param month
+        @param year
+        @param is_expense: True -> type name is expense. Otherwise, balance
+         */
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        String sql = "";
+        if(is_expense) {
+            sql = " Select M." + MONTHLY_TOTAL_TOTAL + " from " + MONTHLY_TOTAL_TABLE + " as M, " + RECORD_TYPE_TABLE + " as R where M." + MONTHLY_TOTAL_MONTH + " = " + month + " and M." + MONTHLY_TOTAL_YEAR + " = " + year + " and M."
+                    + MONTHLY_TOTAL_TYPE_ID + " = R." + RECORD_TYPE_TYPE_ID + " and R." + RECORD_TYPE_TYPE_NAME + " = '" + constant.getRecordTypeExpenseName() + "'";
+        }else{
+            sql = " Select M." + MONTHLY_TOTAL_TOTAL + " from " + MONTHLY_TOTAL_TABLE + " as M, " + RECORD_TYPE_TABLE + " as R where M." + MONTHLY_TOTAL_MONTH + " = " + month + " and M." + MONTHLY_TOTAL_YEAR + " = " + year + " and M."
+                    + MONTHLY_TOTAL_TYPE_ID + " = R." + RECORD_TYPE_TYPE_ID + " and R." + RECORD_TYPE_TYPE_NAME + " != '" + constant.getRecordTypeExpenseName() + "'";
+        }
+        Double total = 0.00;
+        Cursor cursor = db.rawQuery(sql, null);
+        try{
+            if (cursor.moveToFirst()) {
+                do {
+                    total += cursor.getDouble(0);
+                } while (cursor.moveToNext());
+            }
+        }catch (Exception e){e.printStackTrace();}
+        finally {
+            if (cursor != null && !cursor.isClosed()){
+                cursor.close();
+            }
+        }
+        return total;
+     }
 
     /* ###################################################################
                             PRIVATE  FUNCTIONS
@@ -164,7 +198,7 @@ public class DBController extends SQLiteOpenHelper {
 
     private void createMonthlyTotalTable(SQLiteDatabase db){
         String sql = "Create table if not exists " + MONTHLY_TOTAL_TABLE + " (" + MONTHLY_TOTAL_MONTH + " integer, " + MONTHLY_TOTAL_YEAR + " integer, " + MONTHLY_TOTAL_TOTAL
-                     + " real, " + MONTHLY_TOTAL_TYPE_ID + " integer, primary key(" + MONTHLY_TOTAL_MONTH + ", " + MONTHLY_TOTAL_YEAR + "), foreign key(" + MONTHLY_TOTAL_TYPE_ID
+                     + " real, " + MONTHLY_TOTAL_TYPE_ID + " integer, primary key(" + MONTHLY_TOTAL_MONTH + ", " + MONTHLY_TOTAL_YEAR + ", " + MONTHLY_TOTAL_TYPE_ID +"), foreign key(" + MONTHLY_TOTAL_TYPE_ID
                 + ") references " + RECORD_TYPE_TABLE + "(" + RECORD_TYPE_TYPE_ID + "))";
         db.execSQL(sql);
     }

@@ -28,6 +28,8 @@ import java.io.FileNotFoundException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.Calendar;
 import controller.UserController;
 import controller.DBController;
 import controller.FileController;
@@ -235,7 +237,7 @@ public class HomeActivity extends AppCompatActivity {
     private void balanceHandle(){
         LinearLayout balanceLayout = (LinearLayout)findViewById(R.id.balance_layout);
         TextView balanceValue = (TextView)findViewById(R.id.balance_value);
-        balanceValue.setText("$" + dbController.getCurrentBalance());
+        balanceValue.setText(String.format(Locale.US, "$%.2f", dbController.getCurrentBalance()));
         balanceLayout.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
@@ -249,6 +251,10 @@ public class HomeActivity extends AppCompatActivity {
     //Handle Expense button
     private void expenceHandle(){
         LinearLayout expenseLayout = (LinearLayout)findViewById(R.id.expense_layout);
+        TextView expenseValue = (TextView)findViewById(R.id.expense_value);
+        Calendar now = Calendar.getInstance();
+        expenseValue.setText(String.format(Locale.US, "$%.2f", dbController.getMonthlyTotal(now.get(Calendar.MONTH) + 1, now.get(Calendar.YEAR), true)));
+        System.out.println("Monthly total: " + dbController.getMonthlyTotal(now.get(Calendar.MONTH) + 1, now.get(Calendar.YEAR), false));
         expenseLayout.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
