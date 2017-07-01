@@ -58,33 +58,7 @@ public class HomeActivity extends AppCompatActivity {
         fileController = new FileController();
 
         //Grapth view handle
-        List<Double> dmTotal = new ArrayList<>();
-        dmTotal.add(2345.00);
-        dmTotal.add(3245.23);
-        dmTotal.add(1345.98);
-        dmTotal.add(2536.75);
-        dmTotal.add(2897.65);
-        dmTotal.add(3176.45);
-        dmTotal.add(1256.87);
-        dmTotal.add(2965.35);
-        dmTotal.add(3785.67);
-        dmTotal.add(3333.55);
-        dmTotal.add(1234.67);
-        dmTotal.add(2765.50);
-        List<Double> wmTotal = new ArrayList<>();
-        wmTotal.add(1256.87);
-        wmTotal.add(2965.35);
-        wmTotal.add(3785.67);
-        wmTotal.add(3333.55);
-        wmTotal.add(1234.67);
-        wmTotal.add(2765.50);
-        wmTotal.add(2345.00);
-        wmTotal.add(3245.23);
-        wmTotal.add(1345.98);
-        wmTotal.add(2536.75);
-        wmTotal.add(2897.65);
-        wmTotal.add(3176.45);
-        this.graphViewHandle(dmTotal, wmTotal, "2017");
+        this.graphViewHandle();
 
         //Deposit button handle
         this.depositBtnHandle();
@@ -167,9 +141,13 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     //Handle graph view
-    private void graphViewHandle( List<Double> dmTotal, List<Double> wmTotal, String grapth_title){
+    private void graphViewHandle(){
         GraphView homeGraphView = (GraphView)findViewById(R.id.home_graph_view);
         homeGraphView.removeAllSeries();
+
+        Calendar now = Calendar.getInstance();
+        List<Double> dmTotal = dbController.getMonthlyTotalByYear(now.get(Calendar.YEAR), false);
+        List<Double> wmTotal = dbController.getMonthlyTotalByYear(now.get(Calendar.YEAR), true);
 
         DataPoint [] dataPointsDeposit = new DataPoint[12];
         for (int i = 1; i <=dmTotal.size(); ++i){
@@ -185,7 +163,7 @@ public class HomeActivity extends AppCompatActivity {
         homeGraphView.getViewport().setMinX(1);
         homeGraphView.getViewport().setMaxX(12);
         homeGraphView.getGridLabelRenderer().setNumHorizontalLabels(12);
-        homeGraphView.setTitle(grapth_title);
+        homeGraphView.setTitle(Integer.toString(now.get(Calendar.YEAR)));
         //Add series of deposit
         homeGraphView.addSeries(seriesDeposit);
         seriesDeposit.setColor(Color.GREEN);
@@ -254,7 +232,6 @@ public class HomeActivity extends AppCompatActivity {
         TextView expenseValue = (TextView)findViewById(R.id.expense_value);
         Calendar now = Calendar.getInstance();
         expenseValue.setText(String.format(Locale.US, "$%.2f", dbController.getMonthlyTotal(now.get(Calendar.MONTH) + 1, now.get(Calendar.YEAR), true)));
-        System.out.println("Monthly total: " + dbController.getMonthlyTotal(now.get(Calendar.MONTH) + 1, now.get(Calendar.YEAR), false));
         expenseLayout.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){

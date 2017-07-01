@@ -10,6 +10,8 @@ import android.util.Log;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import constant.Constant;
@@ -163,10 +165,10 @@ public class DBController extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         String sql = "";
         if(is_expense) {
-            sql = " Select M." + MONTHLY_TOTAL_TOTAL + " from " + MONTHLY_TOTAL_TABLE + " as M, " + RECORD_TYPE_TABLE + " as R where M." + MONTHLY_TOTAL_MONTH + " = " + month + " and M." + MONTHLY_TOTAL_YEAR + " = " + year + " and M."
+            sql = " Select sum(M." + MONTHLY_TOTAL_TOTAL + ") from " + MONTHLY_TOTAL_TABLE + " as M, " + RECORD_TYPE_TABLE + " as R where M." + MONTHLY_TOTAL_MONTH + " = " + month + " and M." + MONTHLY_TOTAL_YEAR + " = " + year + " and M."
                     + MONTHLY_TOTAL_TYPE_ID + " = R." + RECORD_TYPE_TYPE_ID + " and R." + RECORD_TYPE_TYPE_NAME + " = '" + constant.getRecordTypeExpenseName() + "'";
         }else{
-            sql = " Select M." + MONTHLY_TOTAL_TOTAL + " from " + MONTHLY_TOTAL_TABLE + " as M, " + RECORD_TYPE_TABLE + " as R where M." + MONTHLY_TOTAL_MONTH + " = " + month + " and M." + MONTHLY_TOTAL_YEAR + " = " + year + " and M."
+            sql = " Select sum(M." + MONTHLY_TOTAL_TOTAL + ") from " + MONTHLY_TOTAL_TABLE + " as M, " + RECORD_TYPE_TABLE + " as R where M." + MONTHLY_TOTAL_MONTH + " = " + month + " and M." + MONTHLY_TOTAL_YEAR + " = " + year + " and M."
                     + MONTHLY_TOTAL_TYPE_ID + " = R." + RECORD_TYPE_TYPE_ID + " and R." + RECORD_TYPE_TYPE_NAME + " != '" + constant.getRecordTypeExpenseName() + "'";
         }
         Double total = 0.00;
@@ -174,7 +176,7 @@ public class DBController extends SQLiteOpenHelper {
         try{
             if (cursor.moveToFirst()) {
                 do {
-                    total += cursor.getDouble(0);
+                   total = cursor.getDouble(0);
                 } while (cursor.moveToNext());
             }
         }catch (Exception e){e.printStackTrace();}
@@ -185,6 +187,38 @@ public class DBController extends SQLiteOpenHelper {
         }
         return total;
      }
+
+    public List<Double> getMonthlyTotalByYear(int year, boolean is_expense){
+        /*
+        Get all monthly total for 12 months by year
+        @param year
+        @param is_expense: True -> type name is expense. Otherwise, balance
+         */
+        SQLiteDatabase db = this.getReadableDatabase();
+        String sql = "";
+        if(is_expense){
+            sql = "select M." + MONTHLY_TOTAL_MONTH + ", sum(M." + MONTHLY_TOTAL_TOTAL + ") from " + MONTHLY_TOTAL_TABLE + " as M, " + RECORD_TYPE_TABLE + " as R where " + MONTHLY_TOTAL_YEAR + " = " + year
+                    + " and M." + MONTHLY_TOTAL_TYPE_ID + " = R." + RECORD_TYPE_TYPE_ID + " and R." + RECORD_TYPE_TYPE_NAME + " = '" + constant.getRecordTypeExpenseName() + "' group by M." + MONTHLY_TOTAL_MONTH;
+        }else{
+            sql = "select M." + MONTHLY_TOTAL_MONTH + ", sum(M." + MONTHLY_TOTAL_TOTAL + ") from " + MONTHLY_TOTAL_TABLE + " as M, " + RECORD_TYPE_TABLE + " as R where " + MONTHLY_TOTAL_YEAR + " = " + year
+                    + " and M." + MONTHLY_TOTAL_TYPE_ID + " = R." + RECORD_TYPE_TYPE_ID + " and R." + RECORD_TYPE_TYPE_NAME + " != '" + constant.getRecordTypeExpenseName() + "' group by M." + MONTHLY_TOTAL_MONTH;
+        }
+        List<Double> totals = new ArrayList<Double>(Collections.nCopies(12, 0.00));
+        Cursor cursor = db.rawQuery(sql, null);
+        try{
+            if (cursor.moveToFirst()) {
+                do {
+                    totals.set(cursor.getInt(0) - 1, cursor.getDouble(1));
+                } while (cursor.moveToNext());
+            }
+        }catch (Exception e){e.printStackTrace();}
+        finally {
+            if (cursor != null && !cursor.isClosed()){
+                cursor.close();
+            }
+        }
+        return totals;
+    }
 
     /* ###################################################################
                             PRIVATE  FUNCTIONS
