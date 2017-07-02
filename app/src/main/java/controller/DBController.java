@@ -43,6 +43,12 @@ public class DBController extends SQLiteOpenHelper {
     private String MONTHLY_TOTAL_YEAR = constant.getMonthlyTotalYear();
     private String MONTHLY_TOTAL_TOTAL = constant.getMonthlyTotalTotal();
     private String MONTHLY_TOTAL_TYPE_ID = constant.getMonthlyTotalTypeID();
+    private String RECORD_TABLE = constant.getRecordTable();
+    private String RECORD_RECORD_ID = constant.getRecordRecordID();
+    private String RECORD_DATE = constant.getRecordDate();
+    private String RECORD_PLACE = constant.getRecordPlace();
+    private String RECORD_AMOUNT = constant.getRecordAmount();
+    private String RECORD_TYPE_ID = constant.getRecordTypeID();
 
     public static synchronized DBController getInstance(Context context){
         if(sInstance == null){
@@ -62,6 +68,8 @@ public class DBController extends SQLiteOpenHelper {
         this.createRecordTypeTable(db);
         // Create Monthly Total table
         this.createMonthlyTotalTable(db);
+        //Create Record table
+        this.createRecordTable(db);
 
     }
 
@@ -220,6 +228,10 @@ public class DBController extends SQLiteOpenHelper {
         return totals;
     }
 
+    public void addRecord(String date, String place, Double amount, String recordType){
+
+    }
+
     /* ###################################################################
                             PRIVATE  FUNCTIONS
      ###################################################################*/
@@ -237,50 +249,19 @@ public class DBController extends SQLiteOpenHelper {
         db.execSQL(sql);
     }
 
-//
-//    // Temporary function
-//    public void getDataType(){
-//
+    private void createRecordTable(SQLiteDatabase db){
+        String sql = "Create table " + RECORD_TABLE + "(" + RECORD_RECORD_ID + " integer primary key AUTOINCREMENT , " + RECORD_DATE + " text not null, " + RECORD_PLACE + " text, "
+                     + RECORD_AMOUNT + " real, " + RECORD_TYPE_ID + " integer, foreign key(" + RECORD_TYPE_ID + ") references " + RECORD_TYPE_TABLE + "(" + RECORD_TYPE_TYPE_ID + "))";
+        db.execSQL(sql);
+    }
+
+//    public void updateDataType(){
 //        SQLiteDatabase db = this.getWritableDatabase();
-//        ArrayList<String> arrTblNames = new ArrayList<String>();
-//        Cursor c = db.rawQuery("SELECT name FROM sqlite_master WHERE type='table'", null);
-//
-//        if (c.moveToFirst()) {
-//            while ( !c.isAfterLast() ) {
-//                arrTblNames.add( c.getString( c.getColumnIndex("name")) );
-//                c.moveToNext();
-//            }
-//        }
-//        System.out.println("in get database");
-//        System.out.println(arrTblNames);
-//
-//        String selectAll = "Select * from " + "DATA_TYPE";
-//        int keyID =0;
-//        String typeName="";
-//        Double total=0.00;
-////        SQLiteDatabase db = this.getWritableDatabase();
-//        Cursor cursor = db.rawQuery(selectAll, null);
-//        try {
-//            if (cursor.moveToFirst()) {
-//                do {
-//                    keyID = Integer.parseInt(cursor.getString(0));
-//                    typeName = cursor.getString(1);
-//                    total = Double.parseDouble(cursor.getString(2));
-//                    System.out.println("KEY ID: " + keyID);
-//                    System.out.println("Type Name: " + typeName);
-//                    System.out.println("Total: " + total);
-//                } while (cursor.moveToNext());
-//            }
-//        }catch (Exception e){
-//            Log.d(android.content.ContentValues.TAG, "Error while try to update");
-//        }
-//        finally {
-//            if (cursor != null && !cursor.isClosed()){
-//                cursor.close();
-//            }
-//        }
-//
-//
+//        ContentValues values = new ContentValues();
+//        values.put(TYPE_TOTAL, 100.26);
+//        values.put(TYPE_NAME, "Testing");
+//        int row = db.update(TABLE_DATA_TYPE, values, KEY_ID + " = ?", new String[] {String.valueOf(2)});
+//        System.out.println("UPDATE SUCCESS: " + row);
 //    }
 
 }

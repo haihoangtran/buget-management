@@ -26,6 +26,13 @@ public class Constant {
     private String MONTHLY_TOTAL_YEAR = "year";
     private String MONTHLY_TOTAL_TOTAL = "total";
     private String MONTHLY_TOTAL_TYPE_ID = "type_id";
+    // Table Record
+    private String RECORD_TABLE = "Record";
+    private String RECORD_RECORD_ID = "record_id";
+    private String RECORD_DATE = "date";
+    private String RECORD_PLACE = "place";
+    private String RECORD_AMOUNT = "amount";
+    private String RECORD_TYPE_ID = "type_id";
 
 
     public String getDatabaseName(){
@@ -82,5 +89,29 @@ public class Constant {
 
     public String getMonthlyTotalTypeID() {
         return MONTHLY_TOTAL_TYPE_ID;
+    }
+
+    public String getRecordTable() {
+        return RECORD_TABLE;
+    }
+
+    public String getRecordRecordID() {
+        return RECORD_RECORD_ID;
+    }
+
+    public String getRecordDate() {
+        return RECORD_DATE;
+    }
+
+    public String getRecordPlace() {
+        return RECORD_PLACE;
+    }
+
+    public String getRecordAmount() {
+        return RECORD_AMOUNT;
+    }
+
+    public String getRecordTypeID() {
+        return RECORD_TYPE_ID;
     }
 }

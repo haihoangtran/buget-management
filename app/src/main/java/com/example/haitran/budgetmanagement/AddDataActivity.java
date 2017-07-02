@@ -22,6 +22,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import controller.DBController;
+import model.RecordModel;
 
 
 public class AddDataActivity extends AppCompatActivity {
@@ -35,6 +37,7 @@ public class AddDataActivity extends AppCompatActivity {
     private RadioButton checkingCb;
     private RadioButton savingCb;
     private Button addBtn;
+    private DBController dbController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,8 +60,9 @@ public class AddDataActivity extends AppCompatActivity {
         this.checkingCb = (RadioButton)findViewById(R.id.checking_checkbox);
         this.savingCb = (RadioButton)findViewById(R.id.saving_checkbox);
         this.addBtn = (Button)findViewById(R.id.add_btn);
+        dbController = DBController.getInstance(AddDataActivity.this);
 
-        // Define value for variable
+        // Define value for variables
         this.dateHandle();
         this.checkingCheckboxHandle();
         this.savingCheckboxHandle();
@@ -188,7 +192,7 @@ public class AddDataActivity extends AppCompatActivity {
         customDialog.show();
     }
 
-    private void confirmationAlert(Map <String, String> data){
+    private void confirmationAlert(final Map <String, String> data){
         // Define and initialize elements
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         final View custom_view = getLayoutInflater().inflate(R.layout.add_data_confirmation_dialog, null);
@@ -204,16 +208,20 @@ public class AddDataActivity extends AppCompatActivity {
         dateTxt.setText(data.get("date"));
         amountTxt.setText(data.get("amount"));
         placeTxt.setText(data.get("place"));
+        final String recordType;
         if (this.dataType == getString(R.string.deposit)){
             placeTitle.setText(getString(R.string.from));
             if (this.checkingCb.isChecked()){
+                recordType = getString(R.string.checking);
                 typeTxt.setText(getString(R.string.checking));
             }
             else{
+                recordType = getString(R.string.saving);
                 typeTxt.setText(getString(R.string.saving));
             }
         }
         else{
+            recordType = getString(R.string.expense);
             placeTitle.setText(getString(R.string.to));
             LinearLayout typeLayout = (LinearLayout)custom_view.findViewById(R.id.confirm_alert_type_layout);
             typeLayout.setVisibility(View.INVISIBLE);
@@ -234,6 +242,7 @@ public class AddDataActivity extends AppCompatActivity {
         yesBtn.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
+                dbController.addRecord(data.get("date"), data.get("place"), Double.parseDouble(data.get("amount")), recordType);
                 Toast toast_msg = Toast.makeText(getApplicationContext(),
                                                  getString(R.string.add_data_successfully_toast_msg),
                                                  Toast.LENGTH_SHORT);
