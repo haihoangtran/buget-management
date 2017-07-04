@@ -259,6 +259,11 @@ public class DBController extends SQLiteOpenHelper {
         String [] dateParts = date.split("/");
         this.updateOrAddMonthlyTotal(Integer.parseInt(dateParts[0]), Integer.parseInt(dateParts[2]), amount, typeID);
         // Update Record Type
+        if (typeID == this.getTypeIDFromRecordType(constant.getRecordTypeExpenseName())){
+            this.updateRecordType(this.getTypeIDFromRecordType(constant.getRecordTypeCheckingName()), -amount);
+        }else{
+            this.updateRecordType(typeID, amount);
+        }
     }
 
     /* ###################################################################
@@ -340,6 +345,34 @@ public class DBController extends SQLiteOpenHelper {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    private void updateRecordType(int typeID, Double amount){
+        /*
+        Update Record Type Table with new amount for typeID by adding amount to current total
+         */
+        SQLiteDatabase db = this.getReadableDatabase();
+        String sql = "Select " + RECORD_TYPE_TYPE_TOTAL + " from " + RECORD_TYPE_TABLE + " where " + RECORD_TYPE_TYPE_ID + " = " + typeID;
+        Cursor cursor = db.rawQuery(sql, null);
+        cursor.moveToFirst();
+        Double newTotal = cursor.getDouble(0) + amount;
+        ContentValues values = new ContentValues();
+        if (newTotal < 0 && typeID == this.getTypeIDFromRecordType(constant.getRecordTypeCheckingName())){
+            int savingID = this.getTypeIDFromRecordType(constant.getRecordTypeSavingName());
+            sql = "Select " + RECORD_TYPE_TYPE_TOTAL + " from " + RECORD_TYPE_TABLE + " where " + RECORD_TYPE_TYPE_ID + " = " + savingID;
+            cursor = db.rawQuery(sql, null);
+            cursor.moveToFirst();
+            newTotal = cursor.getDouble(0) + newTotal;
+            db = this.getWritableDatabase();
+            values.put(RECORD_TYPE_TYPE_TOTAL, 0.00);
+            db.update(RECORD_TYPE_TABLE, values, RECORD_TYPE_TYPE_ID + " = " + typeID, null);
+            values.put(RECORD_TYPE_TYPE_TOTAL, newTotal);
+            db.update(RECORD_TYPE_TABLE, values, RECORD_TYPE_TYPE_ID + " = " + savingID, null);
+        }else{
+            db = this.getWritableDatabase();
+            values.put(RECORD_TYPE_TYPE_TOTAL, newTotal);
+            db.update(RECORD_TYPE_TABLE, values, RECORD_TYPE_TYPE_ID + " = " + typeID, null);
         }
     }
 
