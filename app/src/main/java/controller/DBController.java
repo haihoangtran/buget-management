@@ -6,17 +6,16 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.content.Context;
-import android.util.Log;
-
 import java.io.FileNotFoundException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-
+import java.util.Date;
 import constant.Constant;
 import controller.FileController;
-
 import model.RecordTypeModel;
 
 /**
@@ -242,7 +241,7 @@ public class DBController extends SQLiteOpenHelper {
         db.beginTransaction();
         try {
             ContentValues values = new ContentValues();
-            values.put(RECORD_DATE, date);
+            values.put(RECORD_DATE, this.convertDatetoSQLDate(date));
             values.put(RECORD_PLACE, place);
             values.put(RECORD_AMOUNT, amount);
             values.put(RECORD_TYPE_ID, typeID);
@@ -374,6 +373,21 @@ public class DBController extends SQLiteOpenHelper {
             values.put(RECORD_TYPE_TYPE_TOTAL, newTotal);
             db.update(RECORD_TYPE_TABLE, values, RECORD_TYPE_TYPE_ID + " = " + typeID, null);
         }
+    }
+
+    private String convertDatetoSQLDate(String date){
+        /*
+        Convert date (MM/dd/YYYY) to (YYYY-MM-DD) for sqlite
+         */
+        String destDate="";
+        try {
+            Date srcDate = new SimpleDateFormat("MM/dd/yyyy").parse(date);
+            destDate = new SimpleDateFormat("yyyy-MM-dd").format(srcDate);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return destDate;
+
     }
 
 //    public void updateDataType(){
