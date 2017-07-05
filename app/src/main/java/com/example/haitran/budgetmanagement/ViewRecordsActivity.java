@@ -10,12 +10,18 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.support.design.widget.TabLayout.Tab;
+import android.widget.TextView;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Locale;
 import java.util.TimeZone;
 import java.util.List;
+import java.util.Map;
+import controller.DBController;
+import model.RecordModel;
 
 public class ViewRecordsActivity extends AppCompatActivity{
 
@@ -23,6 +29,8 @@ public class ViewRecordsActivity extends AppCompatActivity{
     private Spinner monthDropdown;
     private Spinner yearDropdown;
     private TabLayout viewTabLayout;
+    private Map <String, String> monthEqual;
+    private DBController dbController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,14 +41,31 @@ public class ViewRecordsActivity extends AppCompatActivity{
         // Create an Back button next to title
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        // Define some variables
+        dbController = DBController.getInstance(ViewRecordsActivity.this);
+        monthEqual= new HashMap<String, String>();
+        monthEqual.put("January", "01");
+        monthEqual.put("February", "02");
+        monthEqual.put("March", "03");
+        monthEqual.put("April", "04");
+        monthEqual.put("May", "05");
+        monthEqual.put("June", "06");
+        monthEqual.put("July", "07");
+        monthEqual.put("August", "08");
+        monthEqual.put("September", "09");
+        monthEqual.put("October", "10");
+        monthEqual.put("November", "11");
+        monthEqual.put("December", "12");
+
+
+        // Get parameter datatype
+        this.dataType = getIntent().getStringExtra("data_type");
+
         //Handle month dropdown
         this.monthDropdownHandle();
 
         //Handle year dropdown
         this.yearDropdownHandle();
-
-        // Get parameter datatype
-        this.dataType = getIntent().getStringExtra("data_type");
 
         this.viewTabLayout  = (TabLayout) findViewById(R.id.view_tab);
         this.tabHandle();
@@ -75,7 +100,7 @@ public class ViewRecordsActivity extends AppCompatActivity{
         this.monthDropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                selectedSpinnerItemshandle();
+                displayedRecords();
             }
 
             @Override
@@ -87,10 +112,7 @@ public class ViewRecordsActivity extends AppCompatActivity{
 
     private void yearDropdownHandle(){
         this.yearDropdown = (Spinner)findViewById(R.id.year_dropdown);
-        List <String> yearItems = new ArrayList<String>(){{
-            add("2016");
-            add("2017");
-        }};
+        List <String> yearItems = dbController.getListYears();
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, yearItems);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -101,7 +123,7 @@ public class ViewRecordsActivity extends AppCompatActivity{
         this.yearDropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
         @Override
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-            selectedSpinnerItemshandle();
+            displayedRecords();
         }
 
         @Override
@@ -111,10 +133,27 @@ public class ViewRecordsActivity extends AppCompatActivity{
     });
 }
 
+    private void monthlyTotalHandle(){
+        /*
+        Handle Mothly Total Text
+         */
+        int month = Integer.parseInt(monthEqual.get(this.monthDropdown.getSelectedItem().toString()));
+        int year = Integer.parseInt(this.yearDropdown.getSelectedItem().toString());
+        TextView monthTotalTxt = (TextView) findViewById(R.id.monthly_total_text);
+        if (dataType.equals(getString(R.string.withdraw))){
+            monthTotalTxt.setText(String.format(Locale.US, "$%.2f", dbController.getMonthlyTotal(month, year, true)));
+            monthTotalTxt.setTextColor(getResources().getColor(R.color.homeExpenseTxt));
+        }else if(dataType.equals(getString(R.string.deposit))){
+            monthTotalTxt.setText(String.format(Locale.US, "$%.2f", dbController.getMonthlyTotal(month, year, false)));
+            monthTotalTxt.setTextColor(getResources().getColor(R.color.homeBalanceTxt));
+        }else{
+            monthTotalTxt.setText("");
+        }
+    }
+
     // Handle all selected items of month and year spinners
-    private void selectedSpinnerItemshandle(){
-        System.out.println("Month: " + this.monthDropdown.getSelectedItem());
-        System.out.println("Year: " + this.yearDropdown.getSelectedItem());
+    private void displayedRecords(){
+        this.monthlyTotalHandle();
         this.listViewHandle();
     }
 
@@ -125,20 +164,15 @@ public class ViewRecordsActivity extends AppCompatActivity{
                 switch(tab.getPosition()){
                     case 0:
                         dataType = getString(R.string.all_view_tab);
-                        System.out.println("Current tab: " + getString(R.string.all_view_tab));
-                        listViewHandle();
                         break;
                     case 1:
                         dataType = getString(R.string.withdraw);
-                        System.out.println("Current tab: " + getString(R.string.withdraw));
-                        listViewHandle();
                         break;
                     case 2:
                         dataType = getString(R.string.deposit);
-                        System.out.println("Current tab: " + getString(R.string.deposit));
-                        listViewHandle();
                         break;
                 }
+                displayedRecords();
             }
 
             @Override
@@ -153,46 +187,28 @@ public class ViewRecordsActivity extends AppCompatActivity{
     }
 
     private void listViewHandle(){
-        final ArrayList<ViewData> datas = new ArrayList<>();
-        datas.add(new ViewData("place 1", "date 1", "withdraw", "$25,096"));
-        datas.add(new ViewData("place 2", "date 2", "withdraw", "$27,096"));
-        datas.add(new ViewData("place 3", "date 3", "deposit", "$14,678"));
-        datas.add(new ViewData("place 4", "date 4", "withdraw", "$23,678"));
-        datas.add(new ViewData("place 5", "date 5", "deposit", "$12,456"));
-        datas.add(new ViewData("place 6", "date 6", "deposit", "$9,097"));
-        datas.add(new ViewData("place 7", "date 7", "withdraw", "$10,234"));
-        datas.add(new ViewData("place 8", "date 8", "withdraw", "$99,567"));
-        datas.add(new ViewData("place 9", "date 9", "deposit", "$23,567"));
-        datas.add(new ViewData("place 10", "date 10", "deposit", "$12,567"));
-        datas.add(new ViewData("place 11", "date 11", "deposit", "$12,879"));
-        datas.add(new ViewData("place 12", "date 12", "withdraw", "$19,,563"));
-        datas.add(new ViewData("place 13", "date 13", "withdraw", "$4,560"));
-        datas.add(new ViewData("place 14", "date 14", "deposit", "$98,576"));
-        datas.add(new ViewData("place 15", "date 15", "withdraw", "$12,345"));
-        datas.add(new ViewData("place 16", "date 16", "withdraw", "$12,457"));
-        datas.add(new ViewData("place 17", "date 17", "withdraw", "$100,485"));
-        datas.add(new ViewData("place 18", "date 18", "deposit", "$12,,309"));
-        datas.add(new ViewData("place 19", "date 19", "withdraw", "15,346"));
-        datas.add(new ViewData("place 20", "date 20", "deposit", "$12,397"));
-        datas.add(new ViewData("place 21", "date 21", "withdraw", "$19,235"));
-        datas.add(new ViewData("place 22", "date 22", "withdraw", "$12,509"));
-        datas.add(new ViewData("place 23", "date 23", "deposit", "$7,349"));
-        datas.add(new ViewData("place 24", "date 24", "withdraw", "$28,342"));
-        datas.add(new ViewData("place 25", "date 25", "withdraw", "$56,097"));
-        datas.add(new ViewData("place 26", "date 26", "deposit", "$49,859"));
-        datas.add(new ViewData("place 27", "date 27", "withdraw", "$36,439"));
+        final ArrayList<RecordModel> records;
+        String month = monthEqual.get(this.monthDropdown.getSelectedItem().toString());
+        String year = this.yearDropdown.getSelectedItem().toString();
+        if (dataType.equals(getString(R.string.all_view_tab))){
+            records = dbController.getMonthlyRecords(month, year, true, true);
+        }else if (dataType.equals(getString(R.string.withdraw))){
+            records = dbController.getMonthlyRecords(month, year, false, true);
+        }else{
+            records = dbController.getMonthlyRecords(month, year, false, false);
+        }
 
-        ViewRecordsAdapter dataAdapter = new ViewRecordsAdapter(this, 0, datas);
-        ListView dataLv = (ListView)findViewById(R.id.data_list_view);
+        ViewRecordsAdapter dataAdapter = new ViewRecordsAdapter(this, 0, records);
+        ListView dataLv = (ListView)findViewById(R.id.record_list_view);
         dataLv.setAdapter(dataAdapter);
 
         dataLv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                final ViewData selectedData = datas.get(position);
+                final RecordModel selectedData = records.get(position);
                 Intent intent = new Intent(ViewRecordsActivity.this, EditDataActivity.class);
-                intent.putExtra("data_type", dataType);
-                intent.putExtra("data", (Serializable) selectedData);
+                intent.putExtra("record_type", dataType);
+                intent.putExtra("record", (Serializable) selectedData);
                 startActivity(intent);
             }
         });

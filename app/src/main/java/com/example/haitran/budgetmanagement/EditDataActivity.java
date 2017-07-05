@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import model.RecordModel;
+
 public class EditDataActivity extends AppCompatActivity {
 
     @Override
@@ -18,19 +20,19 @@ public class EditDataActivity extends AppCompatActivity {
 
 
         // Sample
-        String datatype = getIntent().getStringExtra("data_type");
-        ViewData data = (ViewData)getIntent().getSerializableExtra("data");
+        String datatype = getIntent().getStringExtra("record_type");
+        RecordModel data = (RecordModel) getIntent().getSerializableExtra("record");
         TextView sampleTxt = (TextView)findViewById(R.id.this_sample_Text);
-        TextView place = (TextView)findViewById(R.id.place_txt);
-        TextView date = (TextView)findViewById(R.id.date_txt);
-        TextView typeData = (TextView)findViewById(R.id.type_txt);
-        TextView amount = (TextView)findViewById(R.id.amount_txt);
-
-        sampleTxt.setText(datatype);
-        place.setText(data.place);
-        date.setText(data.date);
-        typeData.setText(data.typeData);
-        amount.setText(data.amount);
+//        TextView place = (TextView)findViewById(R.id.place_txt);
+//        TextView date = (TextView)findViewById(R.id.date_txt);
+//        TextView typeData = (TextView)findViewById(R.id.type_txt);
+//        TextView amount = (TextView)findViewById(R.id.amount_txt);
+//
+//        sampleTxt.setText(datatype);
+//        place.setText(data.place);
+//        date.setText(data.date);
+//        typeData.setText(data.typeData);
+//        amount.setText(data.amount);
 
 
     }

@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Date;
 import constant.Constant;
 import controller.FileController;
+import model.RecordModel;
 import model.RecordTypeModel;
 
 /**
@@ -227,6 +228,29 @@ public class DBController extends SQLiteOpenHelper {
         return totals;
     }
 
+    public List<String> getListYears(){
+        /*
+        Get list of years in Monthly_Total table
+         */
+        SQLiteDatabase db = this.getReadableDatabase();
+        String sql = "select " + MONTHLY_TOTAL_YEAR + " from " + MONTHLY_TOTAL_TABLE + " group by " + MONTHLY_TOTAL_YEAR;
+        List<String> years = new ArrayList<>();
+        Cursor cursor = db.rawQuery(sql, null);
+        try{
+            if (cursor.moveToFirst()) {
+                do {
+                    years.add(cursor.getString(0));
+                } while (cursor.moveToNext());
+            }
+        }catch (Exception e){e.printStackTrace();}
+        finally {
+            if (cursor != null && !cursor.isClosed()){
+                cursor.close();
+            }
+        }
+        return years;
+    }
+
     public void addRecord(String date, String place, Double amount, String recordType){
         /*
         Add record to Record table with 3 steps:
@@ -263,6 +287,44 @@ public class DBController extends SQLiteOpenHelper {
         }else{
             this.updateRecordType(typeID, amount);
         }
+    }
+
+    public ArrayList<RecordModel> getMonthlyRecords(String month, String year, boolean is_all, boolean is_expensed){
+        /*
+        Get Record by month and year
+         */
+        SQLiteDatabase db = this.getReadableDatabase();
+        String sql = "";
+        if (is_all){
+            sql = "Select r." + RECORD_RECORD_ID + ", r." + RECORD_DATE + ", r." + RECORD_PLACE + ", r." + RECORD_AMOUNT + ", r." + RECORD_TYPE_ID + ", rt." + RECORD_TYPE_TYPE_NAME +
+                    " from " + RECORD_TABLE + " as r, " + RECORD_TYPE_TABLE + " as rt where strftime('%m', r." + RECORD_DATE + ") = '" + month + "' and strftime('%Y', r." + RECORD_DATE + ") = '" + year +
+                    "' and r." + RECORD_TYPE_ID + " = rt." + RECORD_TYPE_TYPE_ID;
+        }else {
+            if (is_expensed){
+                sql = "Select r." + RECORD_RECORD_ID + ", r." + RECORD_DATE + ", r." + RECORD_PLACE + ", r." + RECORD_AMOUNT + ", r." + RECORD_TYPE_ID + ", rt." + RECORD_TYPE_TYPE_NAME +
+                        " from " + RECORD_TABLE + " as r, " + RECORD_TYPE_TABLE + " as rt where strftime('%m', r." + RECORD_DATE + ") = '" + month + "' and strftime('%Y', r." + RECORD_DATE + ") = '" + year +
+                        "' and r." + RECORD_TYPE_ID + " = rt." + RECORD_TYPE_TYPE_ID + " and rt." + RECORD_TYPE_TYPE_NAME + " = '" + constant.getRecordTypeExpenseName() + "'";
+            }else{
+                sql = "Select r." + RECORD_RECORD_ID + ", r." + RECORD_DATE + ", r." + RECORD_PLACE + ", r." + RECORD_AMOUNT + ", r." + RECORD_TYPE_ID + ", rt." + RECORD_TYPE_TYPE_NAME +
+                        " from " + RECORD_TABLE + " as r, " + RECORD_TYPE_TABLE + " as rt where strftime('%m', r." + RECORD_DATE + ") = '" + month + "' and strftime('%Y', r." + RECORD_DATE + ") = '" + year +
+                        "' and r." + RECORD_TYPE_ID + " = rt." + RECORD_TYPE_TYPE_ID + " and rt." + RECORD_TYPE_TYPE_NAME + " != '" + constant.getRecordTypeExpenseName() + "'";
+            }
+        }
+        ArrayList<RecordModel> records = new ArrayList<>();
+        Cursor cursor = db.rawQuery(sql, null);
+        try{
+            if (cursor.moveToFirst()) {
+                do {
+                    records.add(new RecordModel(cursor.getInt(0), convertSQLDatetoDate(cursor.getString(1)), cursor.getString(2), cursor.getDouble(3), cursor.getInt(4), cursor.getString(5)));
+                } while (cursor.moveToNext());
+            }
+        }catch (Exception e){e.printStackTrace();}
+        finally {
+            if (cursor != null && !cursor.isClosed()){
+                cursor.close();
+            }
+        }
+        return records;
     }
 
     /* ###################################################################
@@ -390,13 +452,18 @@ public class DBController extends SQLiteOpenHelper {
 
     }
 
-//    public void updateDataType(){
-//        SQLiteDatabase db = this.getWritableDatabase();
-//        ContentValues values = new ContentValues();
-//        values.put(TYPE_TOTAL, 100.26);
-//        values.put(TYPE_NAME, "Testing");
-//        int row = db.update(TABLE_DATA_TYPE, values, KEY_ID + " = ?", new String[] {String.valueOf(2)});
-//        System.out.println("UPDATE SUCCESS: " + row);
-//    }
+    private String convertSQLDatetoDate(String sqlDate){
+        /*
+        Convert a sql date (YYYY-MM-DD) to (MM/dd/YYYY) for sqlite
+         */
+        String destDate="";
+        try {
+            Date srcDate = new SimpleDateFormat("yyyy-MM-dd").parse(sqlDate);
+            destDate = new SimpleDateFormat("MM/dd/yyyy").format(srcDate);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return destDate;
+    }
 
 }

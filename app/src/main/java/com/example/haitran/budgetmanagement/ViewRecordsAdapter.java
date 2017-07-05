@@ -7,28 +7,30 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
-
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import constant.Constant;
+import model.RecordModel;
 
 /**
  * Created by haitran on 6/4/17.
  */
 
-class ViewRecordsAdapter extends ArrayAdapter<ViewData> {
+class ViewRecordsAdapter extends ArrayAdapter<RecordModel> {
     private Context context;
-    private List<ViewData> datas;
+    private List<RecordModel> records;
+    private  Constant constant = new Constant();
 
-
-    public ViewRecordsAdapter(Context context, int resource, ArrayList<ViewData> datas){
-        super(context, resource, datas);
+    public ViewRecordsAdapter(Context context, int resource, ArrayList<RecordModel> records){
+        super(context, resource, records);
         this.context = context;
-        this.datas = datas;
+        this.records = records;
     }
 
     public View getView(int position, View convertView, ViewGroup parent) {
         // Get the data item for this position
-        ViewData data = datas.get(position);
+        RecordModel record = records.get(position);
 
         LayoutInflater inflater = (LayoutInflater)context.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
         View view = inflater.inflate(R.layout.view_record_cell, null);
@@ -40,10 +42,17 @@ class ViewRecordsAdapter extends ArrayAdapter<ViewData> {
         TextView amountTxt = (TextView) view.findViewById(R.id.amount_txt);
 
         // Populate the data into the template view using the data object
-        placeTxt.setText(data.place);
-        dateTxt.setText(data.date);
-        typeTxt.setText(data.typeData);
-        amountTxt.setText(data.amount);
+        placeTxt.setText(record.getPlace());
+        dateTxt.setText(record.getDate());
+        amountTxt.setText(String.format(Locale.US, "$%.2f", record.getAmount()));
+        String typeName = record.getTypeName();
+        if(typeName.equals(constant.getRecordTypeExpenseName())){
+            typeTxt.setText(this.context.getString(R.string.withdraw).toLowerCase());
+            typeTxt.setTextColor(this.context.getResources().getColor(R.color.homeExpenseTxt));
+        }else{
+            typeTxt.setText(typeName.toLowerCase());
+            typeTxt.setTextColor(this.context.getResources().getColor(R.color.homeBalanceTxt));
+        }
 
         // Return the completed view to render on screen
         return view;
