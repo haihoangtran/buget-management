@@ -51,4 +51,5 @@
     </string-array>
     <string name="edit_data_msg">To edit a data, click on its cell.</string>
     <string name="edit_title">Edit</string>
+    <string name="delete_btn">Delete</string>
 </resources>
