@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/edit_confirmation_alert_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="serif-monospace"
+        android:paddingBottom="20dp"
+        android:paddingLeft="5dp"
+        android:paddingTop="10dp"
+        android:text="@string/confirmation_alert_title"
+        android:textColor="@color/editUserNameTitle"
+        android:textSize="24sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/edit_confirmation_alert_msg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:paddingBottom="10dp"
+        android:paddingLeft="5dp"
+        android:textAlignment="viewStart"
+        android:textColor="@color/addDataMsg"
+        android:textSize="15dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right"
+        android:gravity="right"
+        android:orientation="horizontal"
+        android:paddingTop="5dp">
+
+        <Button
+            android:id="@+id/edit_confirmation_alert_left_btn"
+            android:layout_width="129dp"
+            android:layout_height="wrap_content"
+            android:background="@color/transparentColor"
+            android:fontFamily="serif-monospace"
+            android:text="@string/cancel"
+            android:textColor="@color/editUserNameTitle"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/edit_confirmation_alert_right_btn"
+            android:layout_width="129dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:background="@color/transparentColor"
+            android:fontFamily="serif-monospace"
+            android:textColor="@color/editUserNameTitle"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+</LinearLayout>

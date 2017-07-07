@@ -1,5 +1,7 @@
 package com.example.haitran.budgetmanagement;
 
+import android.content.Intent;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -61,6 +63,8 @@ public class EditDataActivity extends AppCompatActivity {
         this.displayCurrentRecord();
         this.checkingCheckboxHandle();
         this.savingCheckboxHandle();
+        this.deleteButtonHandle();
+        this.editButtonHandle();
 
     }
 
@@ -118,5 +122,75 @@ public class EditDataActivity extends AppCompatActivity {
                 checkingCb.setChecked(false);
             }
         });
+    }
+
+    private void deleteButtonHandle(){
+        deleteBtn.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                confirmationAlert(false);
+            }
+        });
+    }
+
+    private void editButtonHandle(){
+        editBtn.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                confirmationAlert(true);
+            }
+        });
+    }
+
+    private void confirmationAlert(final boolean is_edit){
+        // Define elements
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        final View customView = getLayoutInflater().inflate(R.layout.edit_confirmation_dialog, null);
+        TextView confirmaMsg = (TextView) customView.findViewById(R.id.edit_confirmation_alert_msg);
+        Button cancelBtn = (Button)customView.findViewById(R.id.edit_confirmation_alert_left_btn);
+        Button rightBtn = (Button)customView.findViewById(R.id.edit_confirmation_alert_right_btn);
+
+        // Set values depends on is_edit or not
+        if (is_edit){
+            confirmaMsg.setText(R.string.edit_confirmation_msg);
+            rightBtn.setText(R.string.edit_confirmation_update_btn);
+        }else{
+            confirmaMsg.setText(R.string.delete_confirmation_msg);
+            rightBtn.setText(R.string.delete_btn);
+        }
+
+        // Set view
+        builder.setView(customView);
+        final AlertDialog customDialog = builder.create();
+
+        // Action of button
+        cancelBtn.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                customDialog.dismiss();
+            }
+        });
+
+        rightBtn.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                if (is_edit){
+                    System.out.println(" Update data");
+                }else{
+                    dbController.deleteRecordByRecordID(currentRecord);
+                }
+
+                // Go back to view Record
+                Intent intent = new Intent(EditDataActivity.this, ViewRecordsActivity.class);
+                intent.putExtra("data_type", dataType);
+                startActivity(intent);
+            }
+        });
+
+        // Show dialog
+        customDialog.show();
+
+
+
     }
 }

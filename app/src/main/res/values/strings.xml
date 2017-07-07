@@ -52,4 +52,7 @@
     <string name="edit_data_msg">To edit a data, click on its cell.</string>
     <string name="edit_title">Edit</string>
     <string name="delete_btn">Delete</string>
+    <string name="delete_confirmation_msg">Are you sure to delete this record?</string>
+    <string name="edit_confirmation_msg">Are you sure to update this record </string>
+    <string name="edit_confirmation_update_btn">Update</string>
 </resources>
