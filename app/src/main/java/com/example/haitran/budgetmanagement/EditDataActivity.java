@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
@@ -12,9 +13,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.TextView;
-
 import java.util.Locale;
-
 import controller.DBController;
 import model.RecordModel;
 import constant.Constant;
@@ -78,6 +77,16 @@ public class EditDataActivity extends AppCompatActivity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event){
+        switch (keyCode){
+            case KeyEvent.KEYCODE_BACK:
+                this.goBackViewRecordActivity();
+                return true;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 
     /* ******************************************************
@@ -177,20 +186,23 @@ public class EditDataActivity extends AppCompatActivity {
                 if (is_edit){
                     System.out.println(" Update data");
                 }else{
+                    customDialog.dismiss();
                     dbController.deleteRecordByRecordID(currentRecord);
                 }
 
                 // Go back to view Record
-                Intent intent = new Intent(EditDataActivity.this, ViewRecordsActivity.class);
-                intent.putExtra("data_type", dataType);
-                startActivity(intent);
+                goBackViewRecordActivity();
             }
         });
 
         // Show dialog
         customDialog.show();
+    }
 
-
-
+    private void goBackViewRecordActivity(){
+        finish();
+        Intent intent = new Intent(EditDataActivity.this, ViewRecordsActivity.class);
+        intent.putExtra("data_type", dataType);
+        startActivity(intent);
     }
 }

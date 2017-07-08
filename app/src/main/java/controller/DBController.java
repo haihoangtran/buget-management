@@ -336,15 +336,17 @@ public class DBController extends SQLiteOpenHelper {
         String [] datePart = record.getDate().split("/");
         // Delete Record out of Record table
         SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(RECORD_TABLE, RECORD_RECORD_ID + " = " + record.getRecordID(), null);
+        int rows = db.delete(RECORD_TABLE, RECORD_RECORD_ID + " = " + record.getRecordID(), null);
         db.close();
         //Update Monthly Total
-        this.updateOrAddMonthlyTotal(Integer.parseInt(datePart[0]), Integer.parseInt(datePart[2]), -record.getAmount(), record.getTypeID());
-        // Update Record Type table
-        if (record.getTypeName().toLowerCase().equals(constant.getRecordTypeExpenseName().toLowerCase())){
-            this.updateRecordType(this.getTypeIDFromRecordType(constant.getRecordTypeCheckingName() ), record.getAmount());
-        }else{
-            this.updateRecordType(record.getTypeID(), -record.getAmount());
+        if (rows == 1) {
+            this.updateOrAddMonthlyTotal(Integer.parseInt(datePart[0]), Integer.parseInt(datePart[2]), -record.getAmount(), record.getTypeID());
+            // Update Record Type table
+            if (record.getTypeName().toLowerCase().equals(constant.getRecordTypeExpenseName().toLowerCase())) {
+                this.updateRecordType(this.getTypeIDFromRecordType(constant.getRecordTypeCheckingName()), record.getAmount());
+            } else {
+                this.updateRecordType(record.getTypeID(), -record.getAmount());
+            }
         }
     }
 

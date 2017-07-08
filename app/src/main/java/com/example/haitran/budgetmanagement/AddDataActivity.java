@@ -1,11 +1,13 @@
 package com.example.haitran.budgetmanagement;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
@@ -79,6 +81,18 @@ public class AddDataActivity extends AppCompatActivity {
             this.withdrawViewHandle();
         }
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event){
+        switch (keyCode){
+            case KeyEvent.KEYCODE_BACK:
+                finish();
+                Intent intent = new Intent(AddDataActivity.this, HomeActivity.class);
+                startActivity(intent);
+                return true;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 
     /* ******************************************************
