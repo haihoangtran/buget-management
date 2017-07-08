@@ -251,7 +251,7 @@ public class DBController extends SQLiteOpenHelper {
         return years;
     }
 
-    public void addRecord(String date, String place, Double amount, String recordType){
+    public void addRecord(String date, String place, Double amount, String typeName){
         /*
         Add record to Record table with 3 steps:
             1/ Add new record to Record Table
@@ -259,7 +259,7 @@ public class DBController extends SQLiteOpenHelper {
             3/ Update total in Record_Type Table
          */
 
-        int typeID = this.getTypeIDFromRecordType(recordType.toLowerCase());
+        int typeID = this.getTypeIDFromRecordType(typeName.toLowerCase());
         // Add record to Record Table
         SQLiteDatabase db = this.getWritableDatabase();
         db.beginTransaction();
@@ -338,14 +338,53 @@ public class DBController extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         int rows = db.delete(RECORD_TABLE, RECORD_RECORD_ID + " = " + record.getRecordID(), null);
         db.close();
-        //Update Monthly Total
         if (rows == 1) {
+            //Update Monthly Total
             this.updateOrAddMonthlyTotal(Integer.parseInt(datePart[0]), Integer.parseInt(datePart[2]), -record.getAmount(), record.getTypeID());
             // Update Record Type table
             if (record.getTypeName().toLowerCase().equals(constant.getRecordTypeExpenseName().toLowerCase())) {
                 this.updateRecordType(this.getTypeIDFromRecordType(constant.getRecordTypeCheckingName()), record.getAmount());
             } else {
                 this.updateRecordType(record.getTypeID(), -record.getAmount());
+            }
+        }
+    }
+
+    public void updateRecord(RecordModel oldRecord, RecordModel newRecord){
+        /*
+        Update a record by ID
+            - if it is different date (delete and then add new record). Otherwise,
+                + Update new Record to Record table
+                + Update Monthly Total table
+                + Update Record Type Table
+         */
+        int newTypeID = this.getTypeIDFromRecordType(newRecord.getTypeName().toLowerCase());
+
+        if (!oldRecord.getDate().equals(newRecord.getDate())){
+            deleteRecordByRecordID(oldRecord);
+            addRecord(newRecord.getDate(), newRecord.getPlace(),newRecord.getAmount(), newRecord.getTypeName());
+        }else{
+            SQLiteDatabase db = this.getWritableDatabase();
+            ContentValues values = new ContentValues();
+            values.put(RECORD_DATE, this.convertDatetoSQLDate(newRecord.getDate()));
+            values.put(RECORD_PLACE, newRecord.getPlace());
+            values.put(RECORD_AMOUNT, newRecord.getAmount());
+            values.put(RECORD_TYPE_ID, newTypeID);
+            int rows = db.update(RECORD_TABLE, values, RECORD_RECORD_ID + " = " + oldRecord.getRecordID(), null);
+            db.close();
+            if(rows == 1){
+                // Update Monthly Total
+                String [] dateParts = oldRecord.getDate().split("/");
+                this.updateOrAddMonthlyTotal(Integer.parseInt(dateParts[0]), Integer.parseInt(dateParts[2]), -oldRecord.getAmount(), oldRecord.getTypeID());
+                this.updateOrAddMonthlyTotal(Integer.parseInt(dateParts[0]), Integer.parseInt(dateParts[2]), newRecord.getAmount(), newTypeID);
+                //Update Record Type
+                if (newRecord.getTypeName().toLowerCase().equals(constant.getRecordTypeExpenseName().toLowerCase())) {
+                    this.updateRecordType(this.getTypeIDFromRecordType(constant.getRecordTypeCheckingName()), oldRecord.getAmount());
+                    this.updateRecordType(this.getTypeIDFromRecordType(constant.getRecordTypeCheckingName()), -newRecord.getAmount());
+                } else {
+                    this.updateRecordType(this.getTypeIDFromRecordType(oldRecord.getTypeName().toLowerCase()), -oldRecord.getAmount());
+                    this.updateRecordType(this.getTypeIDFromRecordType(newRecord.getTypeName().toLowerCase()), newRecord.getAmount());
+                }
             }
         }
     }

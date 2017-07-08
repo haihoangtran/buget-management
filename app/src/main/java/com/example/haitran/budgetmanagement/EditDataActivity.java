@@ -110,7 +110,7 @@ public class EditDataActivity extends AppCompatActivity {
         }
         this.dateTf.setText(currentRecord.getDate());
         this.placeTf.setText(currentRecord.getPlace());
-        this.amountTf.setText(String.format(Locale.US, "$%.2f", currentRecord.getAmount()));
+        this.amountTf.setText(String.format(Locale.US, "%.2f", currentRecord.getAmount()));
     }
 
     private void checkingCheckboxHandle(){
@@ -183,10 +183,24 @@ public class EditDataActivity extends AppCompatActivity {
         rightBtn.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
+                customDialog.dismiss();
                 if (is_edit){
-                    System.out.println(" Update data");
+                    String typeName = currentRecord.getTypeName();
+                    if (!typeName.equals(constant.getRecordTypeExpenseName())){
+                        if(checkingCb.isChecked()){
+                            typeName = getString(R.string.checking);
+                        }else if(savingCb.isChecked()){
+                            typeName = getString(R.string.saving);
+                        }
+                    }
+                    RecordModel newRecord = new RecordModel(currentRecord.getRecordID(),
+                                                            dateTf.getText().toString(),
+                                                            placeTf.getText().toString(),
+                                                            Double.parseDouble(amountTf.getText().toString()),
+                                                            0,
+                                                            typeName);
+                    dbController.updateRecord(currentRecord, newRecord);
                 }else{
-                    customDialog.dismiss();
                     dbController.deleteRecordByRecordID(currentRecord);
                 }
 
