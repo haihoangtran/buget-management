@@ -133,17 +133,17 @@ public class ViewRecordsActivity extends AppCompatActivity{
         // Set first selected option
         this.yearDropdown.setSelection(yearItems.size() - 1);
         this.yearDropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-        @Override
-        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-            displayedRecords();
-        }
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                displayedRecords();
+            }
 
-        @Override
-        public void onNothingSelected(AdapterView<?> parent) {
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
 
-        }
-    });
-}
+            }
+        });
+    }
 
     private void monthlyTotalHandle(){
         /*

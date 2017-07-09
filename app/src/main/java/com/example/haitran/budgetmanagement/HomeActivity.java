@@ -21,7 +21,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
-import com.jjoe64.graphview.series.LineGraphSeries;
+import com.jjoe64.graphview.series.BarGraphSeries;
 import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Locale;
@@ -70,6 +70,9 @@ public class HomeActivity extends AppCompatActivity {
 
         //Expense button handle
         this.expenceHandle();
+
+        //Chart button handle
+        this.chartHandle();
     }
 
     // Handle App Permission
@@ -153,8 +156,8 @@ public class HomeActivity extends AppCompatActivity {
         for (int i = 1; i <=wmTotal.size(); ++i){
             dataPointsWithdraw[i-1] = new DataPoint(i, wmTotal.get(i-1));
         }
-        LineGraphSeries<DataPoint> seriesDeposit = new LineGraphSeries<>(dataPointsDeposit);
-        LineGraphSeries<DataPoint> seriesWithdraw = new LineGraphSeries<>(dataPointsWithdraw);
+        BarGraphSeries<DataPoint> seriesDeposit = new BarGraphSeries<>(dataPointsDeposit);
+        BarGraphSeries<DataPoint> seriesWithdraw = new BarGraphSeries<>(dataPointsWithdraw);
         homeGraphView.getViewport().setXAxisBoundsManual(true);
         homeGraphView.getViewport().setMinX(1);
         homeGraphView.getViewport().setMaxX(12);
@@ -166,6 +169,14 @@ public class HomeActivity extends AppCompatActivity {
         //Add series of withdraw
         homeGraphView.addSeries(seriesWithdraw);
         seriesWithdraw.setColor(Color.RED);
+
+        homeGraphView.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                Intent intent = new Intent(HomeActivity.this, ChartActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     // Handle Deposit Button
@@ -233,6 +244,18 @@ public class HomeActivity extends AppCompatActivity {
             public void onClick(View view){
                 Intent intent = new Intent(HomeActivity.this, ViewRecordsActivity.class);
                 intent.putExtra("data_type", getString(R.string.withdraw));
+                startActivity(intent);
+            }
+        });
+    }
+
+    //Handle Chart button
+    private void chartHandle(){
+        LinearLayout chartLayout = (LinearLayout)findViewById(R.id.chart_layout);
+        chartLayout.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                Intent intent = new Intent(HomeActivity.this, ChartActivity.class);
                 startActivity(intent);
             }
         });
