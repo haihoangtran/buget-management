@@ -42,6 +42,7 @@
 
                 <EditText
                     android:id="@+id/edit_date_tf"
+                    style="@android:style/Widget.Material.Light.EditText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="30dp"
@@ -51,12 +52,13 @@
                     android:layout_weight="1"
                     android:background="@drawable/custom_square_border"
                     android:contentDescription="date_info"
-                    android:cursorVisible="false"
+                    android:cursorVisible="true"
                     android:ems="10"
                     android:fontFamily="monospace"
                     android:inputType="date"
                     android:paddingLeft="5dp"
                     android:textAlignment="center"
+                    android:textCursorDrawable="@null"
                     android:textSize="18sp" />
 
                 <TextView
@@ -80,12 +82,12 @@
                     android:layout_weight="1"
                     android:background="@drawable/custom_square_border"
                     android:contentDescription="date_info"
-                    android:cursorVisible="false"
                     android:ems="10"
                     android:fontFamily="monospace"
                     android:inputType="textPersonName"
                     android:paddingLeft="5dp"
                     android:textAlignment="center"
+                    android:textCursorDrawable="@null"
                     android:textSize="18sp" />
 
                 <TextView
@@ -110,12 +112,13 @@
                     android:layout_weight="1"
                     android:background="@drawable/custom_square_border"
                     android:contentDescription="date_info"
-                    android:cursorVisible="false"
+                    android:cursorVisible="true"
                     android:ems="10"
                     android:fontFamily="monospace"
                     android:inputType="numberDecimal"
                     android:paddingLeft="5dp"
                     android:textAlignment="center"
+                    android:textCursorDrawable="@null"
                     android:textSize="18sp" />
 
                 <LinearLayout
