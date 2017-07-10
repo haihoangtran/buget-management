@@ -208,7 +208,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:background="@color/addDataNavigation"
+        android:background="@android:drawable/bottom_bar"
         app:menu="@menu/navigation" />
 
 </LinearLayout>
