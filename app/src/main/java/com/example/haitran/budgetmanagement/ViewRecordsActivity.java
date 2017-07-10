@@ -124,7 +124,12 @@ public class ViewRecordsActivity extends AppCompatActivity{
 
     private void yearDropdownHandle(){
         this.yearDropdown = (Spinner)findViewById(R.id.year_dropdown);
-        List <String> yearItems = dbController.getListYears();
+        List<String> yearItems = new ArrayList<>();
+        yearItems = dbController.getListYears();
+        if (yearItems.isEmpty()){
+            Calendar calendar = Calendar.getInstance(TimeZone.getDefault());
+            yearItems.add(Integer.toString(calendar.get(Calendar.YEAR)));
+        }
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, yearItems);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
