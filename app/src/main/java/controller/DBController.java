@@ -23,69 +23,92 @@ import model.RecordTypeModel;
  * Created by haitran on 6/21/17.
  */
 
+
+class CONSTANT{
+    private static Constant constant = new Constant();
+    public  String DB_NAME = constant.getDatabaseName();
+    public  int DB_VERSION = constant.getDatabaseVersion();
+    public String PACKAGE_NAME = constant.PACKAGE_NAME;
+
+    // USER TABLE
+    public String USER_TABLE = constant.getUserTable();
+    public String USER_ID = constant.getUserID();
+    public String USER_NAME = constant.getUserName();
+
+    // BUDGET CATEGORY TABLE
+    public String BC_TABLE = constant.getBudgetCategoryTable();
+    public String BC_ID = constant.getBudgetCategoryID();
+    public String BC_TYPE = constant.getBudgetCategoryType();
+
+    // Budget Monthly Table
+    public String BM_TABLE = constant.getBudgetMontlyTable();
+    public String BM_MONTH = constant.getBudgetMontlyMonth();
+    public String BM_YEAR = constant.getBudgetMontlyYear();
+    public String BM_BC_ID = constant.getBudgetMontlyBCID();
+    public String BM_AMOUNT = constant.getBudgetMontlyAmount();
+    // Budget_Detail Table
+    public String BD_TABLE = constant.getBudgetDetailTable();
+    public String BD_ID = constant.getBudgetDetailID();
+    public String BD_DATE = constant.getBudgetDetailDate();
+    public String BD_PLACE = constant.getBudgetDetailPlace();
+    public String BD_AMOUNT = constant.getBudgetDetailAmount();
+    public String BD_BC_ID = constant.getBudgetDetailBCID();
+    // Payment Table
+    public String P_TABLE = constant.getPaymentTable();
+    public String P_ID = constant.getPaymentID();
+    public String P_TO = constant.getPaymentTo();
+    public String P_TOTAL = constant.getPaymentTotal();             // total amount paid
+    public String P_BALANCE =constant.getPaymentBalance();          // amount are left
+    public String P_COMPLETE = constant.getPaymentComplete();
+    // Paument_Detail Table
+    public String PD_TABLE = constant.getPaymentDetailTable();
+    public String PD_ID = constant.getPaymentDetailID();
+    public String PD_AMOUNT = constant.getPaymentDetailAmount();
+    public String PD_DATE = constant.getPaymentDetailDate();
+    public String PD_P_ID = constant.getPaymentDetailPID();
+}
+
 public class DBController extends SQLiteOpenHelper {
     private SQLiteDatabase mDataBase;
     private Context context;
     private static DBController sInstance;
-    private static Constant constant = new Constant();
+    private static CONSTANT constant = new CONSTANT();
     private static FileController fileController = new FileController();
 
-
-    // Define some constant variables
-    private String DB_NAME = constant.getDatabaseName();
-    private int DB_VERSION = constant.getDatabaseVersion();
-    private String RECORD_TYPE_TABLE = constant.getRecordTypeTable();
-    private String RECORD_TYPE_TYPE_ID = constant.getRecordTypeTypeID();
-    private String RECORD_TYPE_TYPE_NAME = constant.getRecordTypeTypeName();
-    private String RECORD_TYPE_TYPE_TOTAL = constant.getRecordTypeTypeTotal();
-    private String MONTHLY_TOTAL_TABLE = constant.getMonthlyTotalTable();
-    private String MONTHLY_TOTAL_MONTH = constant.getMonthlyTotalMonth();
-    private String MONTHLY_TOTAL_YEAR = constant.getMonthlyTotalYear();
-    private String MONTHLY_TOTAL_TOTAL = constant.getMonthlyTotalTotal();
-    private String MONTHLY_TOTAL_TYPE_ID = constant.getMonthlyTotalTypeID();
-    private String RECORD_TABLE = constant.getRecordTable();
-    private String RECORD_RECORD_ID = constant.getRecordRecordID();
-    private String RECORD_DATE = constant.getRecordDate();
-    private String RECORD_PLACE = constant.getRecordPlace();
-    private String RECORD_AMOUNT = constant.getRecordAmount();
-    private String RECORD_TYPE_ID = constant.getRecordTypeID();
-
-    public static synchronized DBController getInstance(Context context){
-        if(sInstance == null){
+    public static synchronized DBController getInstance(Context context) {
+        if (sInstance == null) {
             sInstance = new DBController(context.getApplicationContext());
         }
         return sInstance;
     }
 
-    private DBController(Context context){
-        super(context, constant.getDatabaseName(), null, constant.getDatabaseVersion());
-        this.context =context;
+    private DBController(Context context) {
+        super(context, constant.DB_NAME, null, constant.DB_VERSION);
+        this.context = context;
     }
 
     @Override
-    public void onCreate(SQLiteDatabase db){
-        // Create Record Type table
-        this.createRecordTypeTable(db);
-        // Create Monthly Total table
-        this.createMonthlyTotalTable(db);
-        //Create Record table
-        this.createRecordTable(db);
+    public void onCreate(SQLiteDatabase db) {
+        // Create USER table
+        this.createUserTable(db);
+        // Create Budget Category table
+        this.createBudgetCategoryTable(db);
 
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion){}
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+    }
 
     @Override
-    public synchronized void close()
-    {
-        if(mDataBase != null)
+    public synchronized void close() {
+        if (mDataBase != null)
             mDataBase.close();
         super.close();
     }
 
     public void openDataBase() throws SQLException {
-        String mPath = "data/data/" + constant.PACKAGE_NAME + "/databases/" + DB_NAME;
+        String mPath = "data/data/" + constant.PACKAGE_NAME + "/databases/" + constant.DB_NAME;
         mDataBase = SQLiteDatabase.openDatabase(mPath, null, SQLiteDatabase.OPEN_READWRITE);
     }
 
@@ -94,416 +117,63 @@ public class DBController extends SQLiteOpenHelper {
         Import database file from another source
         @param from: database from
          */
-        switch (from){
+        switch (from) {
             case "local":
-                try{
+                try {
                     fileController.importDBFromLocalStorage();
-                }catch(FileNotFoundException e){
+                } catch (FileNotFoundException e) {
                     throw e;
                 }
                 break;
         }
-        try{
+        try {
             this.openDataBase();
             this.getReadableDatabase();
-        }catch (SQLException e){
+        } catch (SQLException e) {
             throw e;
         }
     }
 
-    public void addDefaultRecordType(){
-        SQLiteDatabase db = this.getWritableDatabase();
-        List <RecordTypeModel> recordTypesList= new ArrayList<>();
-        recordTypesList.add(new RecordTypeModel(1, constant.getRecordTypeCheckingName(), 0.00));
-        recordTypesList.add(new RecordTypeModel(2, constant.getRecordTypeSavingName(), 0.00));
-        recordTypesList.add(new RecordTypeModel(3, constant.getRecordTypeExpenseName(), 0.00));
-        db.beginTransaction();
-        try {
-            ContentValues values = new ContentValues();
-            for (RecordTypeModel recordType : recordTypesList) {
-                values.put(RECORD_TYPE_TYPE_ID, recordType.getTypeID());
-                values.put(RECORD_TYPE_TYPE_NAME, recordType.getTypeName());
-                values.put(RECORD_TYPE_TYPE_TOTAL, recordType.getTypeTotal());
-                db.insert(RECORD_TYPE_TABLE, null, values);
-            }
-            db.setTransactionSuccessful();
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        finally {
-            db.endTransaction();
-            db.close();
-        }
 
-    }
 
-    public Double getCurrentBalance(){
-        /*
-        Get current balance from Record Type table by sum of checking and saving
-         */
-        SQLiteDatabase db = this.getReadableDatabase();
-        String sql = "Select * from " + constant.getRecordTypeTable();
-        Double currentBalance = 0.00;
-        Cursor cursor = db.rawQuery(sql, null);
-        try{
-            if (cursor.moveToFirst()) {
-                do {
-                    if (!cursor.getString(1).matches(constant.getRecordTypeExpenseName())){
-                        currentBalance += cursor.getDouble(2);
-                    }
-                } while (cursor.moveToNext());
-            }
-        }catch (Exception e){e.printStackTrace();}
-        finally {
-            if (cursor != null && !cursor.isClosed()){
-                cursor.close();
-            }
-        }
-        return currentBalance;
-    }
-
-    public Double getMonthlyTotal(int month, int year, boolean is_expense){
-        /*
-        Get monthly total of record type by month and year
-        @param month
-        @param year
-        @param is_expense: True -> type name is expense. Otherwise, balance
-         */
-
-        SQLiteDatabase db = this.getReadableDatabase();
-        String sql = "";
-        if(is_expense) {
-            sql = " Select sum(M." + MONTHLY_TOTAL_TOTAL + ") from " + MONTHLY_TOTAL_TABLE + " as M, " + RECORD_TYPE_TABLE + " as R where M." + MONTHLY_TOTAL_MONTH + " = " + month + " and M." + MONTHLY_TOTAL_YEAR + " = " + year + " and M."
-                    + MONTHLY_TOTAL_TYPE_ID + " = R." + RECORD_TYPE_TYPE_ID + " and R." + RECORD_TYPE_TYPE_NAME + " = '" + constant.getRecordTypeExpenseName() + "'";
-        }else{
-            sql = " Select sum(M." + MONTHLY_TOTAL_TOTAL + ") from " + MONTHLY_TOTAL_TABLE + " as M, " + RECORD_TYPE_TABLE + " as R where M." + MONTHLY_TOTAL_MONTH + " = " + month + " and M." + MONTHLY_TOTAL_YEAR + " = " + year + " and M."
-                    + MONTHLY_TOTAL_TYPE_ID + " = R." + RECORD_TYPE_TYPE_ID + " and R." + RECORD_TYPE_TYPE_NAME + " != '" + constant.getRecordTypeExpenseName() + "'";
-        }
-        Double total = 0.00;
-        Cursor cursor = db.rawQuery(sql, null);
-        try{
-            if (cursor.moveToFirst()) {
-                do {
-                   total = cursor.getDouble(0);
-                } while (cursor.moveToNext());
-            }
-        }catch (Exception e){e.printStackTrace();}
-        finally {
-            if (cursor != null && !cursor.isClosed()){
-                cursor.close();
-            }
-        }
-        return total;
-     }
-
-    public List<Double> getMonthlyTotalByYear(int year, boolean is_expense){
-        /*
-        Get all monthly total for 12 months by year
-        @param year
-        @param is_expense: True -> type name is expense. Otherwise, balance
-         */
-        SQLiteDatabase db = this.getReadableDatabase();
-        String sql = "";
-        if(is_expense){
-            sql = "select M." + MONTHLY_TOTAL_MONTH + ", sum(M." + MONTHLY_TOTAL_TOTAL + ") from " + MONTHLY_TOTAL_TABLE + " as M, " + RECORD_TYPE_TABLE + " as R where " + MONTHLY_TOTAL_YEAR + " = " + year
-                    + " and M." + MONTHLY_TOTAL_TYPE_ID + " = R." + RECORD_TYPE_TYPE_ID + " and R." + RECORD_TYPE_TYPE_NAME + " = '" + constant.getRecordTypeExpenseName() + "' group by M." + MONTHLY_TOTAL_MONTH;
-        }else{
-            sql = "select M." + MONTHLY_TOTAL_MONTH + ", sum(M." + MONTHLY_TOTAL_TOTAL + ") from " + MONTHLY_TOTAL_TABLE + " as M, " + RECORD_TYPE_TABLE + " as R where " + MONTHLY_TOTAL_YEAR + " = " + year
-                    + " and M." + MONTHLY_TOTAL_TYPE_ID + " = R." + RECORD_TYPE_TYPE_ID + " and R." + RECORD_TYPE_TYPE_NAME + " != '" + constant.getRecordTypeExpenseName() + "' group by M." + MONTHLY_TOTAL_MONTH;
-        }
-        List<Double> totals = new ArrayList<Double>(Collections.nCopies(12, 0.00));
-        Cursor cursor = db.rawQuery(sql, null);
-        try{
-            if (cursor.moveToFirst()) {
-                do {
-                    totals.set(cursor.getInt(0) - 1, cursor.getDouble(1));
-                } while (cursor.moveToNext());
-            }
-        }catch (Exception e){e.printStackTrace();}
-        finally {
-            if (cursor != null && !cursor.isClosed()){
-                cursor.close();
-            }
-        }
-        return totals;
-    }
-
-    public List<String> getListYears(){
-        /*
-        Get list of years in Monthly_Total table
-         */
-        SQLiteDatabase db = this.getReadableDatabase();
-        String sql = "select " + MONTHLY_TOTAL_YEAR + " from " + MONTHLY_TOTAL_TABLE + " group by " + MONTHLY_TOTAL_YEAR;
-        List<String> years = new ArrayList<>();
-        Cursor cursor = db.rawQuery(sql, null);
-        try{
-            if (cursor.moveToFirst()) {
-                do {
-                    years.add(cursor.getString(0));
-                } while (cursor.moveToNext());
-            }
-        }catch (Exception e){e.printStackTrace();}
-        finally {
-            if (cursor != null && !cursor.isClosed()){
-                cursor.close();
-            }
-        }
-        return years;
-    }
-
-    public void addRecord(String date, String place, Double amount, String typeName){
-        /*
-        Add record to Record table with 3 steps:
-            1/ Add new record to Record Table
-            2/ Update or add total in Monthly_Total table
-            3/ Update total in Record_Type Table
-         */
-
-        int typeID = this.getTypeIDFromRecordType(typeName.toLowerCase());
-        // Add record to Record Table
-        SQLiteDatabase db = this.getWritableDatabase();
-        db.beginTransaction();
-        try {
-            ContentValues values = new ContentValues();
-            values.put(RECORD_DATE, this.convertDatetoSQLDate(date));
-            values.put(RECORD_PLACE, place);
-            values.put(RECORD_AMOUNT, amount);
-            values.put(RECORD_TYPE_ID, typeID);
-            db.insert(RECORD_TABLE, null, values);
-            db.setTransactionSuccessful();
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        finally {
-            db.endTransaction();
-            db.close();
-        }
-        // Update or add total in Monthly_Total table
-        String [] dateParts = date.split("/");
-        this.updateOrAddMonthlyTotal(Integer.parseInt(dateParts[0]), Integer.parseInt(dateParts[2]), amount, typeID);
-        // Update Record Type
-        if (typeID == this.getTypeIDFromRecordType(constant.getRecordTypeExpenseName())){
-            this.updateRecordType(this.getTypeIDFromRecordType(constant.getRecordTypeCheckingName()), -amount);
-        }else{
-            this.updateRecordType(typeID, amount);
-        }
-    }
-
-    public ArrayList<RecordModel> getMonthlyRecords(String month, String year, boolean is_all, boolean is_expensed){
-        /*
-        Get Record by month and year
-         */
-        SQLiteDatabase db = this.getReadableDatabase();
-        String sql = "";
-        if (is_all){
-            sql = "Select r." + RECORD_RECORD_ID + ", r." + RECORD_DATE + ", r." + RECORD_PLACE + ", r." + RECORD_AMOUNT + ", r." + RECORD_TYPE_ID + ", rt." + RECORD_TYPE_TYPE_NAME +
-                    " from " + RECORD_TABLE + " as r, " + RECORD_TYPE_TABLE + " as rt where strftime('%m', r." + RECORD_DATE + ") = '" + month + "' and strftime('%Y', r." + RECORD_DATE + ") = '" + year +
-                    "' and r." + RECORD_TYPE_ID + " = rt." + RECORD_TYPE_TYPE_ID;
-        }else {
-            if (is_expensed){
-                sql = "Select r." + RECORD_RECORD_ID + ", r." + RECORD_DATE + ", r." + RECORD_PLACE + ", r." + RECORD_AMOUNT + ", r." + RECORD_TYPE_ID + ", rt." + RECORD_TYPE_TYPE_NAME +
-                        " from " + RECORD_TABLE + " as r, " + RECORD_TYPE_TABLE + " as rt where strftime('%m', r." + RECORD_DATE + ") = '" + month + "' and strftime('%Y', r." + RECORD_DATE + ") = '" + year +
-                        "' and r." + RECORD_TYPE_ID + " = rt." + RECORD_TYPE_TYPE_ID + " and rt." + RECORD_TYPE_TYPE_NAME + " = '" + constant.getRecordTypeExpenseName() + "'";
-            }else{
-                sql = "Select r." + RECORD_RECORD_ID + ", r." + RECORD_DATE + ", r." + RECORD_PLACE + ", r." + RECORD_AMOUNT + ", r." + RECORD_TYPE_ID + ", rt." + RECORD_TYPE_TYPE_NAME +
-                        " from " + RECORD_TABLE + " as r, " + RECORD_TYPE_TABLE + " as rt where strftime('%m', r." + RECORD_DATE + ") = '" + month + "' and strftime('%Y', r." + RECORD_DATE + ") = '" + year +
-                        "' and r." + RECORD_TYPE_ID + " = rt." + RECORD_TYPE_TYPE_ID + " and rt." + RECORD_TYPE_TYPE_NAME + " != '" + constant.getRecordTypeExpenseName() + "'";
-            }
-        }
-        ArrayList<RecordModel> records = new ArrayList<>();
-        Cursor cursor = db.rawQuery(sql, null);
-        try{
-            if (cursor.moveToFirst()) {
-                do {
-                    records.add(new RecordModel(cursor.getInt(0), convertSQLDatetoDate(cursor.getString(1)), cursor.getString(2), cursor.getDouble(3), cursor.getInt(4), cursor.getString(5)));
-                } while (cursor.moveToNext());
-            }
-        }catch (Exception e){e.printStackTrace();}
-        finally {
-            if (cursor != null && !cursor.isClosed()){
-                cursor.close();
-            }
-        }
-        return records;
-    }
-
-    public void deleteRecordByRecordID(RecordModel record){
-        /*
-            - Delete Record out of Record table
-            - Update Monthly_Total table
-            - Update total in Record Type
-         */
-        String [] datePart = record.getDate().split("/");
-        // Delete Record out of Record table
-        SQLiteDatabase db = this.getWritableDatabase();
-        int rows = db.delete(RECORD_TABLE, RECORD_RECORD_ID + " = " + record.getRecordID(), null);
-        db.close();
-        if (rows == 1) {
-            //Update Monthly Total
-            this.updateOrAddMonthlyTotal(Integer.parseInt(datePart[0]), Integer.parseInt(datePart[2]), -record.getAmount(), record.getTypeID());
-            // Update Record Type table
-            if (record.getTypeName().toLowerCase().equals(constant.getRecordTypeExpenseName().toLowerCase())) {
-                this.updateRecordType(this.getTypeIDFromRecordType(constant.getRecordTypeCheckingName()), record.getAmount());
-            } else {
-                this.updateRecordType(record.getTypeID(), -record.getAmount());
-            }
-        }
-    }
-
-    public void updateRecord(RecordModel oldRecord, RecordModel newRecord){
-        /*
-        Update a record by ID
-            - if it is different date (delete and then add new record). Otherwise,
-                + Update new Record to Record table
-                + Update Monthly Total table
-                + Update Record Type Table
-         */
-        int newTypeID = this.getTypeIDFromRecordType(newRecord.getTypeName().toLowerCase());
-
-        if (!oldRecord.getDate().equals(newRecord.getDate())){
-            deleteRecordByRecordID(oldRecord);
-            addRecord(newRecord.getDate(), newRecord.getPlace(),newRecord.getAmount(), newRecord.getTypeName());
-        }else{
-            SQLiteDatabase db = this.getWritableDatabase();
-            ContentValues values = new ContentValues();
-            values.put(RECORD_DATE, this.convertDatetoSQLDate(newRecord.getDate()));
-            values.put(RECORD_PLACE, newRecord.getPlace());
-            values.put(RECORD_AMOUNT, newRecord.getAmount());
-            values.put(RECORD_TYPE_ID, newTypeID);
-            int rows = db.update(RECORD_TABLE, values, RECORD_RECORD_ID + " = " + oldRecord.getRecordID(), null);
-            db.close();
-            if(rows == 1){
-                // Update Monthly Total
-                String [] dateParts = oldRecord.getDate().split("/");
-                this.updateOrAddMonthlyTotal(Integer.parseInt(dateParts[0]), Integer.parseInt(dateParts[2]), -oldRecord.getAmount(), oldRecord.getTypeID());
-                this.updateOrAddMonthlyTotal(Integer.parseInt(dateParts[0]), Integer.parseInt(dateParts[2]), newRecord.getAmount(), newTypeID);
-                //Update Record Type
-                if (newRecord.getTypeName().toLowerCase().equals(constant.getRecordTypeExpenseName().toLowerCase())) {
-                    this.updateRecordType(this.getTypeIDFromRecordType(constant.getRecordTypeCheckingName()), oldRecord.getAmount());
-                    this.updateRecordType(this.getTypeIDFromRecordType(constant.getRecordTypeCheckingName()), -newRecord.getAmount());
-                } else {
-                    this.updateRecordType(this.getTypeIDFromRecordType(oldRecord.getTypeName().toLowerCase()), -oldRecord.getAmount());
-                    this.updateRecordType(this.getTypeIDFromRecordType(newRecord.getTypeName().toLowerCase()), newRecord.getAmount());
-                }
-            }
-        }
-    }
-
-    /* ###################################################################
-                            PRIVATE  FUNCTIONS
-     ###################################################################*/
-
-    private void createRecordTypeTable(SQLiteDatabase db){
-        String sql = "Create table if not exists " + RECORD_TYPE_TABLE +" (" + RECORD_TYPE_TYPE_ID + " integer, " + RECORD_TYPE_TYPE_NAME + " text, " + RECORD_TYPE_TYPE_TOTAL
-                     + " real, primary key(" + RECORD_TYPE_TYPE_ID + "))";
+    /*************************************************
+     *              PRIVATE FUNCTIONS                *
+     *************************************************/
+    private void createUserTable(SQLiteDatabase db){
+        String sql = "Create table if not exists " + constant.USER_TABLE + " (" + constant.USER_ID + " integer primary key AUTOINCREMENT, " + constant.USER_NAME + " text)";
         db.execSQL(sql);
     }
 
-    private void createMonthlyTotalTable(SQLiteDatabase db){
-        String sql = "Create table if not exists " + MONTHLY_TOTAL_TABLE + " (" + MONTHLY_TOTAL_MONTH + " integer, " + MONTHLY_TOTAL_YEAR + " integer, " + MONTHLY_TOTAL_TOTAL
-                     + " real, " + MONTHLY_TOTAL_TYPE_ID + " integer, primary key(" + MONTHLY_TOTAL_MONTH + ", " + MONTHLY_TOTAL_YEAR + ", " + MONTHLY_TOTAL_TYPE_ID +"), foreign key(" + MONTHLY_TOTAL_TYPE_ID
-                + ") references " + RECORD_TYPE_TABLE + "(" + RECORD_TYPE_TYPE_ID + "))";
+    private void createBudgetCategoryTable(SQLiteDatabase db){
+        String sql = "Create table if not exists " + constant.BC_TABLE + " (" + constant.BC_ID + " integer , " + constant.BC_TYPE + " text, primary key (" + constant.BC_ID + "))";
         db.execSQL(sql);
     }
 
-    private void createRecordTable(SQLiteDatabase db){
-        String sql = "Create table " + RECORD_TABLE + "(" + RECORD_RECORD_ID + " integer primary key AUTOINCREMENT , " + RECORD_DATE + " text not null, " + RECORD_PLACE + " text, "
-                     + RECORD_AMOUNT + " real, " + RECORD_TYPE_ID + " integer, foreign key(" + RECORD_TYPE_ID + ") references " + RECORD_TYPE_TABLE + "(" + RECORD_TYPE_TYPE_ID + "))";
+    private void createBudgetMonthlyTable(SQLiteDatabase db){
+        String sql = "Create table if not exists " + constant.BM_TABLE + " (" + constant.BM_MONTH + " integer, " + constant.BM_YEAR + " integer, " + constant.BM_BC_ID + " integer, " +
+                      constant.BM_AMOUNT + " real, primary key (" + constant.BM_MONTH + ", " + constant.BM_YEAR + ", " + constant.BM_BC_ID + "), foreign key (" + constant.BM_BC_ID +
+                ") references " + constant. BC_TABLE + "( " + constant.BC_ID + "))";
         db.execSQL(sql);
     }
 
-    private int getTypeIDFromRecordType(String typeName){
-        SQLiteDatabase db = this.getReadableDatabase();
-        String sql = "Select " + RECORD_TYPE_TYPE_ID + " from " + RECORD_TYPE_TABLE + " where " + RECORD_TYPE_TYPE_NAME + " = '" + typeName + "'";
-        int typeID = 0;
-        Cursor cursor = db.rawQuery(sql, null);
-        try{
-            if (cursor.moveToFirst()) {
-                do {
-                    typeID = cursor.getInt(0);
-                } while (cursor.moveToNext());
-            }
-        }catch (Exception e){e.printStackTrace();}
-        finally {
-            if (cursor != null && !cursor.isClosed()){
-                cursor.close();
-            }
-        }
-        return typeID;
+    private void createBudgetDetailTable(SQLiteDatabase db){
+
     }
 
-    private void updateOrAddMonthlyTotal(int month, int year, double amount, int typeID){
-        SQLiteDatabase db = this.getReadableDatabase();
-        String sql = "Select * from " + MONTHLY_TOTAL_TABLE + " where " + MONTHLY_TOTAL_MONTH + " = " + month  + " and " + MONTHLY_TOTAL_YEAR + " = " + year + " and " + MONTHLY_TOTAL_TYPE_ID + " = " + typeID;
-        Cursor cursor = db.rawQuery(sql, null);
-        db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        if (cursor.getCount() == 1){
-            String whereClause = MONTHLY_TOTAL_MONTH + " = " + month + " and " + MONTHLY_TOTAL_YEAR + " = " + year + " and " + MONTHLY_TOTAL_TYPE_ID + " = " + typeID;
-            cursor.moveToFirst();
-            values.put(MONTHLY_TOTAL_MONTH, cursor.getInt(0));
-            values.put(MONTHLY_TOTAL_YEAR, cursor.getInt(1));
-            values.put(MONTHLY_TOTAL_TOTAL, cursor.getDouble(2) + amount);
-            values.put(MONTHLY_TOTAL_TYPE_ID, cursor.getInt(3));
-            db.update(MONTHLY_TOTAL_TABLE, values, whereClause, null);
-        }else if (cursor.getCount() == 0){
-            db.beginTransaction();
-            try{
-                values.put(MONTHLY_TOTAL_MONTH, month);
-                values.put(MONTHLY_TOTAL_YEAR, year);
-                values.put(MONTHLY_TOTAL_TOTAL, amount);
-                values.put(MONTHLY_TOTAL_TYPE_ID, typeID);
-                db.insert(MONTHLY_TOTAL_TABLE, null, values);
-                db.setTransactionSuccessful();
-            }catch(Exception e){
-                e.printStackTrace();
-            }
-            finally{
-                db.endTransaction();
-                db.close();
-            }
-        }else{
-            try {
-                throw new Exception ("There are 2 or more records from Monthly Total");
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
+    private void createPaymentTable(SQLiteDatabase db){
+
     }
 
-    private void updateRecordType(int typeID, Double amount){
-        /*
-        Update Record Type Table with new amount for typeID by adding amount to current total
-         */
-        SQLiteDatabase db = this.getReadableDatabase();
-        String sql = "Select " + RECORD_TYPE_TYPE_TOTAL + " from " + RECORD_TYPE_TABLE + " where " + RECORD_TYPE_TYPE_ID + " = " + typeID;
-        Cursor cursor = db.rawQuery(sql, null);
-        cursor.moveToFirst();
-        Double newTotal = cursor.getDouble(0) + amount;
-        ContentValues values = new ContentValues();
-        if (newTotal < 0 && typeID == this.getTypeIDFromRecordType(constant.getRecordTypeCheckingName())){
-            int savingID = this.getTypeIDFromRecordType(constant.getRecordTypeSavingName());
-            sql = "Select " + RECORD_TYPE_TYPE_TOTAL + " from " + RECORD_TYPE_TABLE + " where " + RECORD_TYPE_TYPE_ID + " = " + savingID;
-            cursor = db.rawQuery(sql, null);
-            cursor.moveToFirst();
-            newTotal = cursor.getDouble(0) + newTotal;
-            db = this.getWritableDatabase();
-            values.put(RECORD_TYPE_TYPE_TOTAL, 0.00);
-            db.update(RECORD_TYPE_TABLE, values, RECORD_TYPE_TYPE_ID + " = " + typeID, null);
-            values.put(RECORD_TYPE_TYPE_TOTAL, newTotal);
-            db.update(RECORD_TYPE_TABLE, values, RECORD_TYPE_TYPE_ID + " = " + savingID, null);
-        }else{
-            db = this.getWritableDatabase();
-            values.put(RECORD_TYPE_TYPE_TOTAL, newTotal);
-            db.update(RECORD_TYPE_TABLE, values, RECORD_TYPE_TYPE_ID + " = " + typeID, null);
-        }
+    private void createPaymentDetailTable(SQLiteDatabase db){
+
     }
 
-    private String convertDatetoSQLDate(String date){
+
+    private String convertDatetoSQLDate(String date) {
         /*
         Convert date (MM/dd/YYYY) to (YYYY-MM-DD) for sqlite
          */
-        String destDate="";
+        String destDate = "";
         try {
             Date srcDate = new SimpleDateFormat("MM/dd/yyyy").parse(date);
             destDate = new SimpleDateFormat("yyyy-MM-dd").format(srcDate);
@@ -514,11 +184,11 @@ public class DBController extends SQLiteOpenHelper {
 
     }
 
-    private String convertSQLDatetoDate(String sqlDate){
+    private String convertSQLDatetoDate(String sqlDate) {
         /*
         Convert a sql date (YYYY-MM-DD) to (MM/dd/YYYY) for sqlite
          */
-        String destDate="";
+        String destDate = "";
         try {
             Date srcDate = new SimpleDateFormat("yyyy-MM-dd").parse(sqlDate);
             destDate = new SimpleDateFormat("MM/dd/yyyy").format(srcDate);
@@ -529,3 +199,402 @@ public class DBController extends SQLiteOpenHelper {
     }
 
 }
+
+
+
+
+
+
+
+
+
+
+
+    //                OLD FUNCTIONS
+//    public void addDefaultRecordType(){
+//        SQLiteDatabase db = this.getWritableDatabase();
+//        List <RecordTypeModel> recordTypesList= new ArrayList<>();
+//        recordTypesList.add(new RecordTypeModel(1, constant.getRecordTypeCheckingName(), 0.00));
+//        recordTypesList.add(new RecordTypeModel(2, constant.getRecordTypeSavingName(), 0.00));
+//        recordTypesList.add(new RecordTypeModel(3, constant.getRecordTypeExpenseName(), 0.00));
+//        db.beginTransaction();
+//        try {
+//            ContentValues values = new ContentValues();
+//            for (RecordTypeModel recordType : recordTypesList) {
+//                values.put(RECORD_TYPE_TYPE_ID, recordType.getTypeID());
+//                values.put(RECORD_TYPE_TYPE_NAME, recordType.getTypeName());
+//                values.put(RECORD_TYPE_TYPE_TOTAL, recordType.getTypeTotal());
+//                db.insert(RECORD_TYPE_TABLE, null, values);
+//            }
+//            db.setTransactionSuccessful();
+//        }catch (Exception e){
+//            e.printStackTrace();
+//        }
+//        finally {
+//            db.endTransaction();
+//            db.close();
+//        }
+//
+//    }
+//
+//    public Double getCurrentBalance(){
+//        /*
+//        Get current balance from Record Type table by sum of checking and saving
+//         */
+//        SQLiteDatabase db = this.getReadableDatabase();
+//        String sql = "Select * from " + constant.getRecordTypeTable();
+//        Double currentBalance = 0.00;
+//        Cursor cursor = db.rawQuery(sql, null);
+//        try{
+//            if (cursor.moveToFirst()) {
+//                do {
+//                    if (!cursor.getString(1).matches(constant.getRecordTypeExpenseName())){
+//                        currentBalance += cursor.getDouble(2);
+//                    }
+//                } while (cursor.moveToNext());
+//            }
+//        }catch (Exception e){e.printStackTrace();}
+//        finally {
+//            if (cursor != null && !cursor.isClosed()){
+//                cursor.close();
+//            }
+//        }
+//        return currentBalance;
+//    }
+//
+//    public Double getMonthlyTotal(int month, int year, boolean is_expense){
+//        /*
+//        Get monthly total of record type by month and year
+//        @param month
+//        @param year
+//        @param is_expense: True -> type name is expense. Otherwise, balance
+//         */
+//
+//        SQLiteDatabase db = this.getReadableDatabase();
+//        String sql = "";
+//        if(is_expense) {
+//            sql = " Select sum(M." + MONTHLY_TOTAL_TOTAL + ") from " + MONTHLY_TOTAL_TABLE + " as M, " + RECORD_TYPE_TABLE + " as R where M." + MONTHLY_TOTAL_MONTH + " = " + month + " and M." + MONTHLY_TOTAL_YEAR + " = " + year + " and M."
+//                    + MONTHLY_TOTAL_TYPE_ID + " = R." + RECORD_TYPE_TYPE_ID + " and R." + RECORD_TYPE_TYPE_NAME + " = '" + constant.getRecordTypeExpenseName() + "'";
+//        }else{
+//            sql = " Select sum(M." + MONTHLY_TOTAL_TOTAL + ") from " + MONTHLY_TOTAL_TABLE + " as M, " + RECORD_TYPE_TABLE + " as R where M." + MONTHLY_TOTAL_MONTH + " = " + month + " and M." + MONTHLY_TOTAL_YEAR + " = " + year + " and M."
+//                    + MONTHLY_TOTAL_TYPE_ID + " = R." + RECORD_TYPE_TYPE_ID + " and R." + RECORD_TYPE_TYPE_NAME + " != '" + constant.getRecordTypeExpenseName() + "'";
+//        }
+//        Double total = 0.00;
+//        Cursor cursor = db.rawQuery(sql, null);
+//        try{
+//            if (cursor.moveToFirst()) {
+//                do {
+//                   total = cursor.getDouble(0);
+//                } while (cursor.moveToNext());
+//            }
+//        }catch (Exception e){e.printStackTrace();}
+//        finally {
+//            if (cursor != null && !cursor.isClosed()){
+//                cursor.close();
+//            }
+//        }
+//        return total;
+//     }
+//
+//    public List<Double> getMonthlyTotalByYear(int year, boolean is_expense){
+//        /*
+//        Get all monthly total for 12 months by year
+//        @param year
+//        @param is_expense: True -> type name is expense. Otherwise, balance
+//         */
+//        SQLiteDatabase db = this.getReadableDatabase();
+//        String sql = "";
+//        if(is_expense){
+//            sql = "select M." + MONTHLY_TOTAL_MONTH + ", sum(M." + MONTHLY_TOTAL_TOTAL + ") from " + MONTHLY_TOTAL_TABLE + " as M, " + RECORD_TYPE_TABLE + " as R where " + MONTHLY_TOTAL_YEAR + " = " + year
+//                    + " and M." + MONTHLY_TOTAL_TYPE_ID + " = R." + RECORD_TYPE_TYPE_ID + " and R." + RECORD_TYPE_TYPE_NAME + " = '" + constant.getRecordTypeExpenseName() + "' group by M." + MONTHLY_TOTAL_MONTH;
+//        }else{
+//            sql = "select M." + MONTHLY_TOTAL_MONTH + ", sum(M." + MONTHLY_TOTAL_TOTAL + ") from " + MONTHLY_TOTAL_TABLE + " as M, " + RECORD_TYPE_TABLE + " as R where " + MONTHLY_TOTAL_YEAR + " = " + year
+//                    + " and M." + MONTHLY_TOTAL_TYPE_ID + " = R." + RECORD_TYPE_TYPE_ID + " and R." + RECORD_TYPE_TYPE_NAME + " != '" + constant.getRecordTypeExpenseName() + "' group by M." + MONTHLY_TOTAL_MONTH;
+//        }
+//        List<Double> totals = new ArrayList<Double>(Collections.nCopies(12, 0.00));
+//        Cursor cursor = db.rawQuery(sql, null);
+//        try{
+//            if (cursor.moveToFirst()) {
+//                do {
+//                    totals.set(cursor.getInt(0) - 1, cursor.getDouble(1));
+//                } while (cursor.moveToNext());
+//            }
+//        }catch (Exception e){e.printStackTrace();}
+//        finally {
+//            if (cursor != null && !cursor.isClosed()){
+//                cursor.close();
+//            }
+//        }
+//        return totals;
+//    }
+//
+//    public List<String> getListYears(){
+//        /*
+//        Get list of years in Monthly_Total table
+//         */
+//        SQLiteDatabase db = this.getReadableDatabase();
+//        String sql = "select " + MONTHLY_TOTAL_YEAR + " from " + MONTHLY_TOTAL_TABLE + " group by " + MONTHLY_TOTAL_YEAR;
+//        List<String> years = new ArrayList<>();
+//        Cursor cursor = db.rawQuery(sql, null);
+//        try{
+//            if (cursor.moveToFirst()) {
+//                do {
+//                    years.add(cursor.getString(0));
+//                } while (cursor.moveToNext());
+//            }
+//        }catch (Exception e){e.printStackTrace();}
+//        finally {
+//            if (cursor != null && !cursor.isClosed()){
+//                cursor.close();
+//            }
+//        }
+//        return years;
+//    }
+//
+//    public void addRecord(String date, String place, Double amount, String typeName){
+//        /*
+//        Add record to Record table with 3 steps:
+//            1/ Add new record to Record Table
+//            2/ Update or add total in Monthly_Total table
+//            3/ Update total in Record_Type Table
+//         */
+//
+//        int typeID = this.getTypeIDFromRecordType(typeName.toLowerCase());
+//        // Add record to Record Table
+//        SQLiteDatabase db = this.getWritableDatabase();
+//        db.beginTransaction();
+//        try {
+//            ContentValues values = new ContentValues();
+//            values.put(RECORD_DATE, this.convertDatetoSQLDate(date));
+//            values.put(RECORD_PLACE, place);
+//            values.put(RECORD_AMOUNT, amount);
+//            values.put(RECORD_TYPE_ID, typeID);
+//            db.insert(RECORD_TABLE, null, values);
+//            db.setTransactionSuccessful();
+//        }catch (Exception e){
+//            e.printStackTrace();
+//        }
+//        finally {
+//            db.endTransaction();
+//            db.close();
+//        }
+//        // Update or add total in Monthly_Total table
+//        String [] dateParts = date.split("/");
+//        this.updateOrAddMonthlyTotal(Integer.parseInt(dateParts[0]), Integer.parseInt(dateParts[2]), amount, typeID);
+//        // Update Record Type
+//        if (typeID == this.getTypeIDFromRecordType(constant.getRecordTypeExpenseName())){
+//            this.updateRecordType(this.getTypeIDFromRecordType(constant.getRecordTypeCheckingName()), -amount);
+//        }else{
+//            this.updateRecordType(typeID, amount);
+//        }
+//    }
+//
+//    public ArrayList<RecordModel> getMonthlyRecords(String month, String year, boolean is_all, boolean is_expensed){
+//        /*
+//        Get Record by month and year
+//         */
+//        SQLiteDatabase db = this.getReadableDatabase();
+//        String sql = "";
+//        if (is_all){
+//            sql = "Select r." + RECORD_RECORD_ID + ", r." + RECORD_DATE + ", r." + RECORD_PLACE + ", r." + RECORD_AMOUNT + ", r." + RECORD_TYPE_ID + ", rt." + RECORD_TYPE_TYPE_NAME +
+//                    " from " + RECORD_TABLE + " as r, " + RECORD_TYPE_TABLE + " as rt where strftime('%m', r." + RECORD_DATE + ") = '" + month + "' and strftime('%Y', r." + RECORD_DATE + ") = '" + year +
+//                    "' and r." + RECORD_TYPE_ID + " = rt." + RECORD_TYPE_TYPE_ID;
+//        }else {
+//            if (is_expensed){
+//                sql = "Select r." + RECORD_RECORD_ID + ", r." + RECORD_DATE + ", r." + RECORD_PLACE + ", r." + RECORD_AMOUNT + ", r." + RECORD_TYPE_ID + ", rt." + RECORD_TYPE_TYPE_NAME +
+//                        " from " + RECORD_TABLE + " as r, " + RECORD_TYPE_TABLE + " as rt where strftime('%m', r." + RECORD_DATE + ") = '" + month + "' and strftime('%Y', r." + RECORD_DATE + ") = '" + year +
+//                        "' and r." + RECORD_TYPE_ID + " = rt." + RECORD_TYPE_TYPE_ID + " and rt." + RECORD_TYPE_TYPE_NAME + " = '" + constant.getRecordTypeExpenseName() + "'";
+//            }else{
+//                sql = "Select r." + RECORD_RECORD_ID + ", r." + RECORD_DATE + ", r." + RECORD_PLACE + ", r." + RECORD_AMOUNT + ", r." + RECORD_TYPE_ID + ", rt." + RECORD_TYPE_TYPE_NAME +
+//                        " from " + RECORD_TABLE + " as r, " + RECORD_TYPE_TABLE + " as rt where strftime('%m', r." + RECORD_DATE + ") = '" + month + "' and strftime('%Y', r." + RECORD_DATE + ") = '" + year +
+//                        "' and r." + RECORD_TYPE_ID + " = rt." + RECORD_TYPE_TYPE_ID + " and rt." + RECORD_TYPE_TYPE_NAME + " != '" + constant.getRecordTypeExpenseName() + "'";
+//            }
+//        }
+//        ArrayList<RecordModel> records = new ArrayList<>();
+//        Cursor cursor = db.rawQuery(sql, null);
+//        try{
+//            if (cursor.moveToFirst()) {
+//                do {
+//                    records.add(new RecordModel(cursor.getInt(0), convertSQLDatetoDate(cursor.getString(1)), cursor.getString(2), cursor.getDouble(3), cursor.getInt(4), cursor.getString(5)));
+//                } while (cursor.moveToNext());
+//            }
+//        }catch (Exception e){e.printStackTrace();}
+//        finally {
+//            if (cursor != null && !cursor.isClosed()){
+//                cursor.close();
+//            }
+//        }
+//        return records;
+//    }
+//
+//    public void deleteRecordByRecordID(RecordModel record){
+//        /*
+//            - Delete Record out of Record table
+//            - Update Monthly_Total table
+//            - Update total in Record Type
+//         */
+//        String [] datePart = record.getDate().split("/");
+//        // Delete Record out of Record table
+//        SQLiteDatabase db = this.getWritableDatabase();
+//        int rows = db.delete(RECORD_TABLE, RECORD_RECORD_ID + " = " + record.getRecordID(), null);
+//        db.close();
+//        if (rows == 1) {
+//            //Update Monthly Total
+//            this.updateOrAddMonthlyTotal(Integer.parseInt(datePart[0]), Integer.parseInt(datePart[2]), -record.getAmount(), record.getTypeID());
+//            // Update Record Type table
+//            if (record.getTypeName().toLowerCase().equals(constant.getRecordTypeExpenseName().toLowerCase())) {
+//                this.updateRecordType(this.getTypeIDFromRecordType(constant.getRecordTypeCheckingName()), record.getAmount());
+//            } else {
+//                this.updateRecordType(record.getTypeID(), -record.getAmount());
+//            }
+//        }
+//    }
+//
+//    public void updateRecord(RecordModel oldRecord, RecordModel newRecord){
+//        /*
+//        Update a record by ID
+//            - if it is different date (delete and then add new record). Otherwise,
+//                + Update new Record to Record table
+//                + Update Monthly Total table
+//                + Update Record Type Table
+//         */
+//        int newTypeID = this.getTypeIDFromRecordType(newRecord.getTypeName().toLowerCase());
+//
+//        if (!oldRecord.getDate().equals(newRecord.getDate())){
+//            deleteRecordByRecordID(oldRecord);
+//            addRecord(newRecord.getDate(), newRecord.getPlace(),newRecord.getAmount(), newRecord.getTypeName());
+//        }else{
+//            SQLiteDatabase db = this.getWritableDatabase();
+//            ContentValues values = new ContentValues();
+//            values.put(RECORD_DATE, this.convertDatetoSQLDate(newRecord.getDate()));
+//            values.put(RECORD_PLACE, newRecord.getPlace());
+//            values.put(RECORD_AMOUNT, newRecord.getAmount());
+//            values.put(RECORD_TYPE_ID, newTypeID);
+//            int rows = db.update(RECORD_TABLE, values, RECORD_RECORD_ID + " = " + oldRecord.getRecordID(), null);
+//            db.close();
+//            if(rows == 1){
+//                // Update Monthly Total
+//                String [] dateParts = oldRecord.getDate().split("/");
+//                this.updateOrAddMonthlyTotal(Integer.parseInt(dateParts[0]), Integer.parseInt(dateParts[2]), -oldRecord.getAmount(), oldRecord.getTypeID());
+//                this.updateOrAddMonthlyTotal(Integer.parseInt(dateParts[0]), Integer.parseInt(dateParts[2]), newRecord.getAmount(), newTypeID);
+//                //Update Record Type
+//                if (newRecord.getTypeName().toLowerCase().equals(constant.getRecordTypeExpenseName().toLowerCase())) {
+//                    this.updateRecordType(this.getTypeIDFromRecordType(constant.getRecordTypeCheckingName()), oldRecord.getAmount());
+//                    this.updateRecordType(this.getTypeIDFromRecordType(constant.getRecordTypeCheckingName()), -newRecord.getAmount());
+//                } else {
+//                    this.updateRecordType(this.getTypeIDFromRecordType(oldRecord.getTypeName().toLowerCase()), -oldRecord.getAmount());
+//                    this.updateRecordType(this.getTypeIDFromRecordType(newRecord.getTypeName().toLowerCase()), newRecord.getAmount());
+//                }
+//            }
+//        }
+//    }
+//
+//    /* ###################################################################
+//                            PRIVATE  FUNCTIONS
+//     ###################################################################*/
+//
+//    private void createRecordTypeTable(SQLiteDatabase db){
+//        String sql = "Create table if not exists " + RECORD_TYPE_TABLE +" (" + RECORD_TYPE_TYPE_ID + " integer, " + RECORD_TYPE_TYPE_NAME + " text, " + RECORD_TYPE_TYPE_TOTAL
+//                     + " real, primary key(" + RECORD_TYPE_TYPE_ID + "))";
+//        db.execSQL(sql);
+//    }
+//
+//    private void createMonthlyTotalTable(SQLiteDatabase db){
+//        String sql = "Create table if not exists " + MONTHLY_TOTAL_TABLE + " (" + MONTHLY_TOTAL_MONTH + " integer, " + MONTHLY_TOTAL_YEAR + " integer, " + MONTHLY_TOTAL_TOTAL
+//                     + " real, " + MONTHLY_TOTAL_TYPE_ID + " integer, primary key(" + MONTHLY_TOTAL_MONTH + ", " + MONTHLY_TOTAL_YEAR + ", " + MONTHLY_TOTAL_TYPE_ID +"), foreign key(" + MONTHLY_TOTAL_TYPE_ID
+//                + ") references " + RECORD_TYPE_TABLE + "(" + RECORD_TYPE_TYPE_ID + "))";
+//        db.execSQL(sql);
+//    }
+//
+//    private void createRecordTable(SQLiteDatabase db){
+//        String sql = "Create table " + RECORD_TABLE + "(" + RECORD_RECORD_ID + " integer primary key AUTOINCREMENT , " + RECORD_DATE + " text not null, " + RECORD_PLACE + " text, "
+//                     + RECORD_AMOUNT + " real, " + RECORD_TYPE_ID + " integer, foreign key(" + RECORD_TYPE_ID + ") references " + RECORD_TYPE_TABLE + "(" + RECORD_TYPE_TYPE_ID + "))";
+//        db.execSQL(sql);
+//    }
+//
+//    private int getTypeIDFromRecordType(String typeName){
+//        SQLiteDatabase db = this.getReadableDatabase();
+//        String sql = "Select " + RECORD_TYPE_TYPE_ID + " from " + RECORD_TYPE_TABLE + " where " + RECORD_TYPE_TYPE_NAME + " = '" + typeName + "'";
+//        int typeID = 0;
+//        Cursor cursor = db.rawQuery(sql, null);
+//        try{
+//            if (cursor.moveToFirst()) {
+//                do {
+//                    typeID = cursor.getInt(0);
+//                } while (cursor.moveToNext());
+//            }
+//        }catch (Exception e){e.printStackTrace();}
+//        finally {
+//            if (cursor != null && !cursor.isClosed()){
+//                cursor.close();
+//            }
+//        }
+//        return typeID;
+//    }
+//
+//    private void updateOrAddMonthlyTotal(int month, int year, double amount, int typeID){
+//        SQLiteDatabase db = this.getReadableDatabase();
+//        String sql = "Select * from " + MONTHLY_TOTAL_TABLE + " where " + MONTHLY_TOTAL_MONTH + " = " + month  + " and " + MONTHLY_TOTAL_YEAR + " = " + year + " and " + MONTHLY_TOTAL_TYPE_ID + " = " + typeID;
+//        Cursor cursor = db.rawQuery(sql, null);
+//        db = this.getWritableDatabase();
+//        ContentValues values = new ContentValues();
+//        if (cursor.getCount() == 1){
+//            String whereClause = MONTHLY_TOTAL_MONTH + " = " + month + " and " + MONTHLY_TOTAL_YEAR + " = " + year + " and " + MONTHLY_TOTAL_TYPE_ID + " = " + typeID;
+//            cursor.moveToFirst();
+//            values.put(MONTHLY_TOTAL_MONTH, cursor.getInt(0));
+//            values.put(MONTHLY_TOTAL_YEAR, cursor.getInt(1));
+//            values.put(MONTHLY_TOTAL_TOTAL, cursor.getDouble(2) + amount);
+//            values.put(MONTHLY_TOTAL_TYPE_ID, cursor.getInt(3));
+//            db.update(MONTHLY_TOTAL_TABLE, values, whereClause, null);
+//        }else if (cursor.getCount() == 0){
+//            db.beginTransaction();
+//            try{
+//                values.put(MONTHLY_TOTAL_MONTH, month);
+//                values.put(MONTHLY_TOTAL_YEAR, year);
+//                values.put(MONTHLY_TOTAL_TOTAL, amount);
+//                values.put(MONTHLY_TOTAL_TYPE_ID, typeID);
+//                db.insert(MONTHLY_TOTAL_TABLE, null, values);
+//                db.setTransactionSuccessful();
+//            }catch(Exception e){
+//                e.printStackTrace();
+//            }
+//            finally{
+//                db.endTransaction();
+//                db.close();
+//            }
+//        }else{
+//            try {
+//                throw new Exception ("There are 2 or more records from Monthly Total");
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        }
+//    }
+//
+//    private void updateRecordType(int typeID, Double amount){
+//        /*
+//        Update Record Type Table with new amount for typeID by adding amount to current total
+//         */
+//        SQLiteDatabase db = this.getReadableDatabase();
+//        String sql = "Select " + RECORD_TYPE_TYPE_TOTAL + " from " + RECORD_TYPE_TABLE + " where " + RECORD_TYPE_TYPE_ID + " = " + typeID;
+//        Cursor cursor = db.rawQuery(sql, null);
+//        cursor.moveToFirst();
+//        Double newTotal = cursor.getDouble(0) + amount;
+//        ContentValues values = new ContentValues();
+//        if (newTotal < 0 && typeID == this.getTypeIDFromRecordType(constant.getRecordTypeCheckingName())){
+//            int savingID = this.getTypeIDFromRecordType(constant.getRecordTypeSavingName());
+//            sql = "Select " + RECORD_TYPE_TYPE_TOTAL + " from " + RECORD_TYPE_TABLE + " where " + RECORD_TYPE_TYPE_ID + " = " + savingID;
+//            cursor = db.rawQuery(sql, null);
+//            cursor.moveToFirst();
+//            newTotal = cursor.getDouble(0) + newTotal;
+//            db = this.getWritableDatabase();
+//            values.put(RECORD_TYPE_TYPE_TOTAL, 0.00);
+//            db.update(RECORD_TYPE_TABLE, values, RECORD_TYPE_TYPE_ID + " = " + typeID, null);
+//            values.put(RECORD_TYPE_TYPE_TOTAL, newTotal);
+//            db.update(RECORD_TYPE_TABLE, values, RECORD_TYPE_TYPE_ID + " = " + savingID, null);
+//        }else{
+//            db = this.getWritableDatabase();
+//            values.put(RECORD_TYPE_TYPE_TOTAL, newTotal);
+//            db.update(RECORD_TYPE_TABLE, values, RECORD_TYPE_TYPE_ID + " = " + typeID, null);
+//        }
+//    }

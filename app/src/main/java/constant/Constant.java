@@ -12,29 +12,44 @@ public class Constant {
     // Constant for database
     private String DATABASE_NAME = "bmdb.db";
     private int DATABASE_VERSION = 1;
-    // Table Record Type
-    private String RECORD_TYPE_TABLE = "Record_Type";
-    private String RECORD_TYPE_TYPE_ID = "type_id";
-    private String RECORD_TYPE_TYPE_NAME = "type_name";
-    private String RECORD_TYPE_TYPE_TOTAL = "type_total";
-    private String RECORD_TYPE_EXPENSE_NAME = "expense";
-    private String RECORD_TYPE_CHECKING_NAME  = "checking";
-    private String RECORD_TYPE_SAVING_NAME = "saving";
-    // Table Monthly Total
-    private String MONTHLY_TOTAL_TABLE = "Monthly_Total";
-    private String MONTHLY_TOTAL_MONTH = "month";
-    private String MONTHLY_TOTAL_YEAR = "year";
-    private String MONTHLY_TOTAL_TOTAL = "total";
-    private String MONTHLY_TOTAL_TYPE_ID = "type_id";
-    // Table Record
-    private String RECORD_TABLE = "Record";
-    private String RECORD_RECORD_ID = "record_id";
-    private String RECORD_DATE = "date";
-    private String RECORD_PLACE = "place";
-    private String RECORD_AMOUNT = "amount";
-    private String RECORD_TYPE_ID = "type_id";
+    // User Table
+    private String U_TABLE = "User";
+    private String U_ID = "u_id";
+    private String U_NAME = "u_name";
+    // Budget_Category Table
+    private String BC_TABLE ="Budget_Category";
+    private String BC_ID = "bc_id";
+    private String BC_TYPE = "bc_type";
+    // Budget Monthly Table
+    private String BM_TABLE = "Budget_Monthly";
+    private String BM_MONTH = "bm_month";
+    private String BM_YEAR = "bm_year";
+    private String BM_BC_ID = "bc_id";
+    private String BM_AMOUNT = "bm_amount";
+    // Budget_Detail Table
+    private String BD_TABLE = "Budget_Detail";
+    private String BD_ID = "bd_id";
+    private String BD_DATE = "bd_date";
+    private String BD_PLACE = "bd_place";
+    private String BD_AMOUNT = "bd_amount";
+    private String BD_BC_ID = "bc_id";
+    // Payment Table
+    private String P_TABLE = "Payment";
+    private String P_ID = "p_id";
+    private String P_TO = "p_to";
+    private String P_TOTAL = "p_total";             // total amount paid
+    private String P_BALANCE ="p_balance";          // amount are left
+    private String P_COMPLETE = "p_complete";
+    // Paument_Detail Table
+    private String PD_TABLE = "Payment_Detail";
+    private String PD_ID = "pd_id";
+    private String PD_AMOUNT = "pd_amount";
+    private String PD_DATE = "pd_date";
+    private String PD_P_ID = "p_id";
 
-
+    /****************************************************
+     *              DATABLE INFORMATION                 *
+     ****************************************************/
     public String getDatabaseName(){
         return DATABASE_NAME;
     }
@@ -43,75 +58,133 @@ public class Constant {
         return DATABASE_VERSION;
     }
 
-    public String getRecordTypeTable(){
-        return RECORD_TYPE_TABLE;
+    /****************************************************
+     *                    USER TABLE                    *
+     ****************************************************/
+    public String getUserTable(){
+        return U_TABLE;
     }
 
-    public String getRecordTypeTypeID(){
-        return RECORD_TYPE_TYPE_ID;
+    public String getUserID (){
+        return U_ID;
     }
 
-    public String getRecordTypeTypeName(){
-        return RECORD_TYPE_TYPE_NAME;
+    public String getUserName (){
+        return U_NAME;
     }
 
-    public String getRecordTypeTypeTotal(){
-        return RECORD_TYPE_TYPE_TOTAL;
+    /****************************************************
+     *            BUDGET CATEGORY TABLE                 *
+     ****************************************************/
+    public String getBudgetCategoryTable(){
+        return BC_TABLE;
     }
 
-    public String getRecordTypeExpenseName() {
-        return RECORD_TYPE_EXPENSE_NAME;
+    public String getBudgetCategoryID(){
+        return BC_ID;
     }
 
-    public String getRecordTypeCheckingName() {
-        return RECORD_TYPE_CHECKING_NAME;
+    public String getBudgetCategoryType(){
+        return BC_TYPE;
     }
 
-    public String getRecordTypeSavingName() {
-        return RECORD_TYPE_SAVING_NAME;
+    /****************************************************
+     *            BUDGET MONTHLY TABLE                  *
+     ****************************************************/
+    public String getBudgetMontlyTable(){
+        return BM_TABLE;
     }
 
-    public String getMonthlyTotalTable() {
-        return MONTHLY_TOTAL_TABLE;
+    public String getBudgetMontlyMonth(){
+        return BM_MONTH;
     }
 
-    public String getMonthlyTotalMonth() {
-        return MONTHLY_TOTAL_MONTH;
+    public String getBudgetMontlyYear(){
+        return BM_YEAR;
     }
 
-    public String getMonthlyTotalYear() {
-        return MONTHLY_TOTAL_YEAR;
+    public String getBudgetMontlyBCID(){
+        return BM_BC_ID;
     }
 
-    public String getMonthlyTotalTotal() {
-        return MONTHLY_TOTAL_TOTAL;
+    public String getBudgetMontlyAmount(){
+        return BM_AMOUNT;
     }
 
-    public String getMonthlyTotalTypeID() {
-        return MONTHLY_TOTAL_TYPE_ID;
+    /****************************************************
+     *              BUDGET DETAIL TABLE                 *
+     ****************************************************/
+    public String getBudgetDetailTable() {
+        return BD_TABLE;
     }
 
-    public String getRecordTable() {
-        return RECORD_TABLE;
+    public String getBudgetDetailID() {
+        return BD_ID;
     }
 
-    public String getRecordRecordID() {
-        return RECORD_RECORD_ID;
+    public String getBudgetDetailDate() {
+        return BD_DATE;
     }
 
-    public String getRecordDate() {
-        return RECORD_DATE;
+    public String getBudgetDetailPlace() {
+        return BD_PLACE;
     }
 
-    public String getRecordPlace() {
-        return RECORD_PLACE;
+    public String getBudgetDetailAmount() {
+        return BD_AMOUNT;
     }
 
-    public String getRecordAmount() {
-        return RECORD_AMOUNT;
+    public String getBudgetDetailBCID() {
+        return BD_BC_ID;
     }
 
-    public String getRecordTypeID() {
-        return RECORD_TYPE_ID;
+    /****************************************************
+     *                  PAYMENT TABLE                   *
+     ****************************************************/
+    public String getPaymentTable() {
+        return P_TABLE;
+    }
+
+    public String getPaymentID() {
+        return P_ID;
+    }
+
+    public String getPaymentTo() {
+        return P_TO;
+    }
+
+    public String getPaymentTotal() {
+        return P_TOTAL;
+    }
+
+    public String getPaymentBalance() {
+        return P_BALANCE;
+    }
+
+    public String getPaymentComplete() {
+        return P_COMPLETE;
+    }
+
+    /****************************************************
+     *              PAYMENT DETAIL TABLE                *
+     ****************************************************/
+    public String getPaymentDetailTable() {
+        return PD_TABLE;
+    }
+
+    public String getPaymentDetailID() {
+        return PD_ID;
+    }
+
+    public String getPaymentDetailAmount() {
+        return PD_AMOUNT;
+    }
+
+    public String getPaymentDetailDate() {
+        return PD_DATE;
+    }
+
+    public String getPaymentDetailPID() {
+        return PD_P_ID;
     }
 }
